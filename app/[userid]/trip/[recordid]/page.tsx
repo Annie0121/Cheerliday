@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import styles from './recordid.module.css';
 import Image from 'next/image';
 import carImage from './car.png'
+//import { Polyline } from '@types/google.maps';
 
 export default function Home(){
     const [user, setUser] = useState<any>(null);
@@ -271,7 +272,7 @@ function Mymap({record,searchMarker,setTravelTimes}:Mymap){
                   disableDefaultUI={true}
                   mapId='842bf081f72c1734'
               >
-                    <MapContent dateRange={dateRange} searchMarker={searchMarker} setTravelTimes={setTravelTimes} />
+                    <MapContent  dateRange={dateRange} searchMarker={searchMarker} setTravelTimes={setTravelTimes} />
               </Map>
             </APIProvider>
             )
@@ -327,9 +328,6 @@ function SearchPlace({setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
                 throw new Error('用戶未登錄');
             }
             
-            
-            const userid = user.uid
-            
             const url = window.location.href.split("/");
             const recordid = url[5];
             
@@ -354,6 +352,7 @@ function SearchPlace({setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
             setPlace("");
             setPlaceCoordinates({ lat: null, lng: null });
             setSelectedDay("");
+            setSearchMarker(null)
             
         } catch (error) {
             console.error("更新資料失敗：", error);
@@ -415,24 +414,29 @@ interface mapcontent{
 //景點路徑
 function MapContent({ dateRange,searchMarker,setTravelTimes }:mapcontent) {
   const map = useMap();
-  const maps = useMapsLibrary("maps");
+  const maps = useMapsLibrary("maps") ;
   const routes = useMapsLibrary("routes");
+  const flightPathsRef = useRef<google.maps.Polyline[]>([]);
   
   useEffect(() => {
     if (!maps || !map) return;
-
-    dateRange.forEach((date) => {
+    
+    dateRange.forEach((date, index) => {
+      let flightPath = flightPathsRef.current[index];
+  
+      if (!flightPath) {
+        flightPath = new maps.Polyline({
+          geodesic: true,
+          strokeColor: "#FF0000",
+          strokeOpacity: 0.3,
+          strokeWeight: 3,
+        });
+        flightPath.setMap(map);
+        flightPathsRef.current[index] = flightPath;
+      }
+  
       const coordinates = date.attractions.map(attraction => attraction.coordinates);
-      
-      const flightPath = new maps.Polyline({
-        path: coordinates,
-        geodesic: true,
-        strokeColor: "#FF0000",  //線條顏色
-        strokeOpacity: 0.3,  //透明度
-        strokeWeight: 3, //粗細
-      });
-      
-      flightPath.setMap(map);
+      flightPath.setPath(coordinates);
     });
   }, [map, maps, dateRange]);
 
@@ -464,7 +468,7 @@ function MapContent({ dateRange,searchMarker,setTravelTimes }:mapcontent) {
       
     </>
   );
-  }
+}
   
 
 interface calculateTravelTimes{
