@@ -36,7 +36,7 @@ export default function Home(){
           }
         })
         return () => unsubscribe();
-    },[setUser,isLoaded])
+    },[setUser,router])
 
    
     //抓取用戶資料，渲染行程總攬
@@ -438,7 +438,7 @@ function MapContent({ dateRange,searchMarker,setTravelTimes }:mapcontent) {
 
 
 
-  usecalculateTravelTimes({dateRange,setTravelTimes})
+  useCalculateTravelTimes({dateRange,setTravelTimes})
     
 
 
@@ -473,7 +473,7 @@ interface calculateTravelTimes{
 }
 
 //交通時間
-function usecalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes) {
+function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes) {
     
     /*const map = useMap();*/
     const routes = useMapsLibrary("routes");
