@@ -265,7 +265,7 @@ function Mymap({record,searchMarker,setTravelTimes}:Mymap){
         return(
             <APIProvider apiKey={"AIzaSyDhfLh8axPm0TpZASZ4EbUV4b4D2shqJKE"} >
               <Map
-                  style={{flex: 3,backgroundColor:'red',height:"calc(100vh - 66.5px)" }}
+                  style={{flex: 3,height:"calc(100vh - 66.5px)" }}
                   defaultCenter={center}
                   defaultZoom={12}
                   gestureHandling={'greedy'}

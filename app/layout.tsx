@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { getAuth, onAuthStateChanged,signOut,signInWithPopup,GoogleAuthProvider } from "firebase/auth";
 import { auth } from "./firebase.js"
 const inter = Inter({ subsets: ["latin"] });
+
 /*
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -75,7 +76,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <div className="header">
           
-          <div className="header_name" onClick={()=>{router.push('/');}}  >
+          <div className="header_name" onClick={()=>{router.push('/trip');}}  >
             funliday
           </div>
           <div className="header_member">

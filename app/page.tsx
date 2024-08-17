@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from 'react'
 import { auth } from "./firebase.js";
 import { getAuth, signInWithPopup,createUserWithEmailAndPassword,signInWithEmailAndPassword ,onAuthStateChanged,GoogleAuthProvider} from "firebase/auth";
-
+import Image from 'next/image';
+import homeImage from './homepage.jpg';
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
@@ -24,7 +25,16 @@ export default function Home() {
 
   return (
     <>
-      <div>首頁</div>
+      <div style={{ position: 'relative'}}>
+        <Image src={homeImage} alt="封面圖片" style={{width:'100%',height:"calc(100vh - 70px)",objectPosition: '50% 65%',objectFit: 'cover',}} priority >
+          
+        </Image>
+        <div style={{position: 'absolute',top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
+          <p className={styles.animatedText} style={{fontSize:'30PX',fontWeight:'700',color:'#E4E4E4',textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'}}> 規劃無界，打造您的夢想行程</p>
+        </div>
+        
+      </div>
+       
     </>
   );
 }
