@@ -161,6 +161,23 @@ function Schedule({record,setSelectedDay,travelTimes}:Schedule){
         
     }
 
+    const handleDel= async(attractionindex:number,dateindex:number)=>{
+      
+      const updatedDateRange = [...record.dateRange];
+      updatedDateRange[dateindex].attractions.splice(attractionindex, 1);
+      const url=window.location.href.split("/")
+      let recordId=url[5];
+      const recordRef = doc(db, "record", recordId); 
+      try {
+          await updateDoc(recordRef, {
+              dateRange: updatedDateRange
+          });
+      } catch (error) {
+          console.error( error);
+      }
+      
+      
+    }
     return(
         <div style={{flex: 2,overflowY: 'auto',height:"calc(100vh - 66.5px)" }}>
             <div style={{width:'100%'}}>
@@ -172,8 +189,7 @@ function Schedule({record,setSelectedDay,travelTimes}:Schedule){
                         {dateRange.map((date, index:number) => (
                         <div key={index} 
                             style={{ width: '100px', border: '1px solid #efefefff', textAlign: 'center', alignContent: 'center', flexShrink: '0', }}
-                            onClick={()=>getdate(index)}
-                        >
+                            onClick={()=>getdate(index)}>
                             {date.date}
                             <div  >第{index+1}天</div>
                         </div>
@@ -181,7 +197,6 @@ function Schedule({record,setSelectedDay,travelTimes}:Schedule){
                     </div>
                     <div style={{width:'40px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',fontSize:'30px',textAlign:'center',paddingTop:'5PX'}} onClick={listRight}>&gt;</div>
                 </div>
-                
             </div>
             <div style={{backgroundColor:'#efefefff',paddingTop:'20PX',paddingBottom:'40px'}}> 
                 {dateRange.map((date,dateindex)=>(
@@ -197,13 +212,12 @@ function Schedule({record,setSelectedDay,travelTimes}:Schedule){
                               {date.date}
                             </p>
                         </div>
-                        
-                        
                         {date.attractions && date.attractions.length > 0 && (
                             date.attractions.map((attraction, attractionindex) => (
                                 <React.Fragment key={attractionindex}>
-                                    <div  style={{width:'100%',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 -4px 6px rgba(0, 0, 0, 0.1)',backgroundColor:'white',height:'130px', }}>
+                                    <div  style={{width:'100%',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 -4px 6px rgba(0, 0, 0, 0.1)',backgroundColor:'white',height:'130px', display:'flex',justifyContent:'space-between'}}>
                                         <div>{attraction.name}</div>
+                                        <span style={{marginRight:'10PX'}} onClick={()=>handleDel(attractionindex,dateindex)}>×</span>
                                     </div>
                                     {attractionindex < date.attractions.length - 1 && (
                                         <div style={{borderLeft: '2px dashed #666666ff',height:'50px',marginLeft:'50px',display:'flex',alignItems:'center'  }}>
@@ -213,32 +227,18 @@ function Schedule({record,setSelectedDay,travelTimes}:Schedule){
                                                   <Image width={20} height={20} src={carImage} alt="Car" />
                                                 </div>
                                             )}
-                                          
                                         </div>
-                                    )
-                                    }
-                                    
+                                    )}
                                 </React.Fragment>
-                                
-                            ))
-                            
+                            ))  
                         )}
-                        
-
                         <div style={{width: '50px',height: '50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',borderRadius:' 50%',display: 'flex',alignItems: 'center',justifyContent: 'center',backgroundColor: 'white',margin:'30px 100px'}}
                         onClick={() => addplace(date.date)}>
                             <span>+</span>
                         </div> 
-
                     </React.Fragment>
                 ))} 
             </div>
-            
-            
-              
-                
-            
-            
         </div>
     )
 }

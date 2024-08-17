@@ -102,6 +102,17 @@ function List({ShowPlan}:ListProps){
     const planUrl= (userid: string, recordid: string)=>{
         window.location.href = `/${userid}/trip/${recordid}`;
     }
+    const handleDel=(id:string)=>{
+        console.log(id);
+        try {
+            deleteDoc(doc(db, "record", id));
+            setRecords(records.filter((item) => item.id !== id));
+          } catch (error) {
+            console.error(error);
+          }
+    
+        
+    }
 
     return(
         <>
@@ -111,8 +122,12 @@ function List({ShowPlan}:ListProps){
            
             <div style={{width:'1080px',margin:'20px auto',display:'flex',flexWrap:'wrap'}}>
                 {records.map((data,index)=>(
-                    <div key={index} onClick={() => planUrl(user.uid, data.id)} style={{width:'250px',height:'200px',margin: '10px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'}}>
-                        <div style={{height:'120px',backgroundColor:'pink'}}>圖片</div>
+                    <div key={data.id} onClick={() => planUrl(user.uid, data.id)} style={{width:'250px',height:'200px',margin: '10px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'}}>
+                        <div style={{height:'120px',backgroundColor:'pink',display:'flex',justifyContent:'space-between'}}>圖片
+                            <div style={{backgroundColor:'white',height:'20px',width:'20px',fontSize:'15px',marginTop:'5PX',display: 'flex', alignItems: 'center', justifyContent: 'center',marginRight:'10px',borderRadius:'50%'}} 
+                                 onClick={(e) => { e.stopPropagation(); handleDel(data.id); }}>×
+                            </div>
+                        </div>
                         <div>
                             <div style={{margin:'10px 10px',fontSize:'18px',fontWeight:700}}>{data.name}</div>
                             <div style={{margin:'10px 10px',fontSize:'16px',fontWeight:500}}>{data.startdate} - {data.enddate}</div>
