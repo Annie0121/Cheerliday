@@ -6,7 +6,8 @@ import React, { useEffect, useState ,useRef} from 'react';
 import { doc, updateDoc,collection, setDoc,getDoc, onSnapshot , query, where,getDocs,deleteDoc } from "firebase/firestore"; 
 import { useRouter } from "next/navigation";
 import styles from './recordid.module.css';
-import carImage from './car.png';
+import Image from 'next/image';
+import carImage from './car.png'
 
 export default function Home(){
     const [user, setUser] = useState<any>(null);
@@ -22,7 +23,7 @@ export default function Home(){
         const  unsubscribe=onAuthStateChanged(auth,(currentUser)=>{
           if(currentUser){
             setUser(currentUser)
-            console.log(currentUser.uid);
+            
             const url=window.location.href.split("/")
             let recordId=url[5];
             if(!isLoaded){
@@ -35,7 +36,7 @@ export default function Home(){
           }
         })
         return () => unsubscribe();
-    },[setUser])
+    },[setUser,isLoaded])
 
    
     //抓取用戶資料，渲染行程總攬
@@ -145,7 +146,7 @@ function Schedule({record,setSelectedDay,travelTimes}:Schedule){
     
     function addplace(date:string){
         setSelectedDay(date);
-        console.log(` ${date}被點擊`);
+        
               
     }
     const dateRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -209,7 +210,7 @@ function Schedule({record,setSelectedDay,travelTimes}:Schedule){
                                            {travelTimes[date.date] && travelTimes[date.date][attractionindex] && (
                                                 <div style={{ margin: '10px',display:'flex' }}>
                                                   <div style={{marginRight:'10px'}}>約 {travelTimes[date.date][attractionindex]} </div>
-                                                  <img style={{height:'20px',width:'20px'}} src={carImage.src} alt="Car" />
+                                                  <Image width={20} height={20} src={carImage} alt="Car" />
                                                 </div>
                                             )}
                                           
@@ -296,7 +297,7 @@ function SearchPlace({setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
         if (coordinates.lat === null || coordinates.lng === null) {
             throw new Error("查無景點");
         }
-        console.log(coordinates);
+        
         setPlaceCoordinates(coordinates);
         setSearchMarker(coordinates);
     } catch (error) {
@@ -318,7 +319,7 @@ function SearchPlace({setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
               lng: placeCoordinates.lng, 
           },
       };
-        console.log(selectedDay);
+        
         
         try {
             const user = auth.currentUser;
@@ -328,7 +329,7 @@ function SearchPlace({setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
             
             
             const userid = user.uid
-            console.log(userid);
+            
             const url = window.location.href.split("/");
             const recordid = url[5];
             
@@ -338,7 +339,7 @@ function SearchPlace({setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
 
             if(docSnap.exists()){
                 const dateRange: DateRangeItem[]  =docSnap.data().dateRange;
-                console.log(dateRange);
+               
                 dateRange.forEach(element => {
                     if(element.date==selectedDay){
                         element.attractions.push(newPlace)   
@@ -347,7 +348,7 @@ function SearchPlace({setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
                 await updateDoc(docRef, { dateRange });
             }
             
-            console.log("景點已成功添加");
+           
     
             // 清空選擇的景點與日期
             setPlace("");
@@ -396,7 +397,7 @@ async function  getCoordinates(address:string) {
 
     const response = await fetch(url);
     const data = await response.json();
-    console.log(data);
+    
     const location = data.results[0].geometry.location;
     return {
       lat: location.lat,
@@ -435,7 +436,9 @@ function MapContent({ dateRange,searchMarker,setTravelTimes }:mapcontent) {
     });
   }, [map, maps, dateRange]);
 
-  calculateTravelTimes({dateRange,setTravelTimes})
+
+
+  usecalculateTravelTimes({dateRange,setTravelTimes})
     
 
 
@@ -470,7 +473,7 @@ interface calculateTravelTimes{
 }
 
 //交通時間
-function calculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes) {
+function usecalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes) {
     
     /*const map = useMap();*/
     const routes = useMapsLibrary("routes");
@@ -482,7 +485,7 @@ function calculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes) {
             return;
           }
       
-        console.log("routes:", routes, "dateRange:", dateRange);
+        
   
       const service = new routes.DistanceMatrixService();
       const newTravelTimes: { [key: string]: string[] } = {};
@@ -509,7 +512,7 @@ function calculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes) {
                     if (status === routes.DistanceMatrixStatus.OK) {
                       if (response) {
                         const results = response.rows[0].elements[0];
-                        console.log(results);
+                        
                         newTravelTimes[day.date].push(results.duration.text);
                       }resolve(null);
                     } else {

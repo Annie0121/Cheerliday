@@ -66,7 +66,7 @@ function List({ShowPlan}:ListProps){
           const querySnapshot = await getDocs(q);
           const userRecords: any[] = [];
           querySnapshot.forEach((doc) => {
-            console.log(doc.id);
+           
             userRecords.push({ id: doc.id, ...doc.data() });
           });
           setRecords(userRecords)
@@ -76,12 +76,12 @@ function List({ShowPlan}:ListProps){
           console.error( error);
         }   
     }
-    console.log(records);
+    
     const router = useRouter();
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
-                console.log(user.uid);
+                
                 fetchUserData(user.uid)
                 setUser(user);
             } else {
@@ -92,7 +92,7 @@ function List({ShowPlan}:ListProps){
             setIsLoaded(true);
         });
         return () => unsubscribe();
-    }, [user]);
+    }, [user,isLoaded]);
 
     if (!isLoaded) {
         return <div>Loading...</div>;
@@ -151,24 +151,22 @@ function Plan({onClose}:PlanProps){
   
     const onChange:RangePickerProps['onChange'] = (dates, dateStrings) => {
       if (dates) {
-        console.log(dates);
+        
         
         setstartdate(dateStrings[0])
         setenddate(dateStrings[1])
         const [start, end] = dates;
         const allDates = generateDateRange(start, end);
         setDateRange(allDates);
-        console.log('選擇的日期範圍：', allDates);
+        
       } else {
         setDateRange([]);
-        console.log('清除日期');
+        
       }
     };
 
 
 
-    console.log(name);
-    console.log(city);
 
     async function getPlan() {
         if (!name) {
@@ -196,7 +194,7 @@ function Plan({onClose}:PlanProps){
             enddate,
             dateRange
           });
-          console.log(userid,docRef.id);
+          
           const recordid =docRef.id
           window.location.href = `/${userid}/trip/${recordid}`;
           
@@ -285,7 +283,7 @@ async function  getCoordinates(address:string) {
 
     const response = await fetch(url);
     const data = await response.json();
-    console.log(data);
+    
     const location = data.results[0].geometry.location;
     return {
       lat: location.lat,
