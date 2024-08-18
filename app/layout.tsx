@@ -77,7 +77,7 @@ export default function RootLayout({
         <div className="header">
           
           <div className="header_name" onClick={()=>{router.push('/trip');}}  >
-            funliday
+            Cheerliday
           </div>
           <div className="header_member">
             {user ? <div onClick={handleSignOut}>登出</div> : <div onClick={handleSignin}>登入</div>}

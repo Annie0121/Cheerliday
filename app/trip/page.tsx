@@ -160,10 +160,6 @@ function Plan({onClose}:PlanProps){
     const [enddate,setenddate]=useState('')
     const [showNameError, setShowNameError] = useState(false);
     const [showCityError, setShowCityError] = useState(false);
-    
-    
-    
-  
     const onChange:RangePickerProps['onChange'] = (dates, dateStrings) => {
       if (dates) {
         

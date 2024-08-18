@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import styles from './recordid.module.css';
 import Image from 'next/image';
 import carImage from './car.png'
-//import { Polyline } from '@types/google.maps';
+
 
 export default function Home(){
     const [user, setUser] = useState<any>(null);
@@ -146,9 +146,7 @@ function Schedule({record,setSelectedDay,travelTimes}:Schedule){
 
     
     function addplace(date:string){
-        setSelectedDay(date);
-        
-              
+        setSelectedDay(date);      
     }
     const dateRef = useRef<(HTMLDivElement | null)[]>([]);
     const getdate =(index:number)=>{
