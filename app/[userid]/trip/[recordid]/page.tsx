@@ -63,7 +63,7 @@ export default function Home(){
     return(
         <div style={{ display: 'flex', width: '100%',alignItems: 'flex-start',height:"calc(100vh - 70px)"   }}>
             {selectedDay?
-            (< SearchPlace setSelectedDay={setSelectedDay} selectedDay={selectedDay} setSearchMarker={setSearchMarker}></SearchPlace>)
+            (< SearchPlace record={record} setSelectedDay={setSelectedDay} selectedDay={selectedDay} setSearchMarker={setSearchMarker}></SearchPlace>)
             :<Schedule setSelectedDay={setSelectedDay} record={record} travelTimes={travelTimes}></Schedule>}
             <Mymap record={record} searchMarker={searchMarker} setTravelTimes={setTravelTimes}></Mymap> 
         </div>
@@ -84,6 +84,7 @@ interface Record {
   name: string;
   startdate: string;
   userid: string;
+  countryCode:string
 }
 
 interface Schedule{
@@ -278,6 +279,7 @@ function Mymap({record,searchMarker,setTravelTimes}:Mymap){
           
 }
 interface searchPlace{
+  record:Record;
   setSelectedDay:React.Dispatch<React.SetStateAction<string>>;
   selectedDay:string;
   setSearchMarker: React.Dispatch<React.SetStateAction<{
@@ -286,13 +288,14 @@ interface searchPlace{
 } | null>>
 }
 
-function SearchPlace({setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
+function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
     const[place,setPlace]=useState('')
     const [placeCoordinates, setPlaceCoordinates] = useState<{ lat: number | null, lng: number | null }>({ lat: null, lng: null });
+    const [countryCode,setCountryCode]= useState(record?record.countryCode:'')
     
     const handleSearchPlace =async () => {
       try {
-        const coordinates = await getCoordinates(place);
+        const coordinates = await getCoordinates(place,countryCode);
         if (coordinates.lat === null || coordinates.lng === null) {
             throw new Error("查無景點");
         }
@@ -387,10 +390,12 @@ function SearchPlace({setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
 
 
 
-async function  getCoordinates(address:string) {
+async function  getCoordinates(address:string,countryCode:string) {
+  console.log(countryCode);
+  
     const apiKey = "AIzaSyDhfLh8axPm0TpZASZ4EbUV4b4D2shqJKE";
     const encodedCity = encodeURIComponent(address);
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedCity}&key=${apiKey}`;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedCity}&region=${countryCode}&key=${apiKey}`;
 
     const response = await fetch(url);
     const data = await response.json();

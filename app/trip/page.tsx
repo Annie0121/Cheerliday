@@ -154,7 +154,7 @@ function Plan({onClose}:PlanProps){
     const[name,setName]=useState("")
     const[city,setCity]=useState('')
     const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
-
+    const [ countryCode,setCountryCode] =useState('')
     const [dateRange, setDateRange] = useState<DateRangeItem[]>([]);
     const [startdate,setstartdate]=useState('')
     const [enddate,setenddate]=useState('')
@@ -189,18 +189,23 @@ function Plan({onClose}:PlanProps){
             
         }
         try {
-          const coordinates = await getCoordinates(city);
-          setCoordinates(coordinates);
-    
+          const citycoordinates = await getCoordinates(city);
+          console.log(citycoordinates.coordinates);
+          console.log(citycoordinates.countryCode);
+          
           const user = auth.currentUser;
           if (!user) {
             throw new Error('用戶未登錄');
           }
           const userid = user.uid;
+          
+          
+          
           const docRef = await addDoc(collection(db, 'record'), {
             userid,
             name,
-            coordinates,
+            coordinates: citycoordinates.coordinates, 
+            countryCode: citycoordinates.countryCode,
             startdate,
             enddate,
             dateRange
@@ -294,11 +299,24 @@ async function  getCoordinates(address:string) {
 
     const response = await fetch(url);
     const data = await response.json();
-    
+    console.log(data);
+    const addressComponents = data.results[0].address_components;
     const location = data.results[0].geometry.location;
+
+    let countryCode = "";
+    for (let component of addressComponents) {
+        if (component.types.includes("country")) {
+        countryCode = component.short_name; 
+        break;
+        }
+    }
+
     return {
-      lat: location.lat,
-      lng: location.lng
+        coordinates:{
+            lat: location.lat,
+            lng: location.lng,
+        },
+        countryCode: countryCode
     };
   }
 
