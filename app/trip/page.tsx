@@ -293,7 +293,8 @@ const DateInput:React.FC<DateInputProps> = ({ onChange }) => {
 
 //獲取城市經緯度
 async function  getCoordinates(address:string) {
-    const apiKey = "AIzaSyDhfLh8axPm0TpZASZ4EbUV4b4D2shqJKE";
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+   
     const encodedCity = encodeURIComponent(address);
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedCity}&key=${apiKey}`;
 

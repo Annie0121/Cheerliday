@@ -8,7 +8,11 @@ import { useRouter } from "next/navigation";
 import styles from './recordid.module.css';
 import Image from 'next/image';
 import carImage from './car.png'
-
+import searchImg from './search.png'
+import openImg from './open.png'
+import webImg from './web.png'
+import phoneImg from './phone.png'
+const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 export default function Home(){
     const [user, setUser] = useState<any>(null);
@@ -96,6 +100,8 @@ interface Schedule{
 interface Attraction {
   coordinates: Coordinates;
   name: string;
+  address:string,
+  picture:string
 }
 interface DateRangeItem {
   date: string;
@@ -215,9 +221,21 @@ function Schedule({record,setSelectedDay,travelTimes}:Schedule){
                         {date.attractions && date.attractions.length > 0 && (
                             date.attractions.map((attraction, attractionindex) => (
                                 <React.Fragment key={attractionindex}>
-                                    <div  style={{width:'100%',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 -4px 6px rgba(0, 0, 0, 0.1)',backgroundColor:'white',height:'130px', display:'flex',justifyContent:'space-between'}}>
-                                        <div>{attraction.name}</div>
-                                        <span style={{marginRight:'10PX'}} onClick={()=>handleDel(attractionindex,dateindex)}>×</span>
+                                    <div  style={{width:'100%',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 -4px 6px rgba(0, 0, 0, 0.1)',backgroundColor:'white',height:'130px', display:'flex',justifyContent:'center',alignItems:'center'}}>
+                                        <div style={{display:'flex',height:'80px',width:'95%'}}>
+                                          <img style={{height:'80px',width:'80px',overflow:'hidden'}} src={attraction.picture}></img>
+                                          <div style={{marginLeft:'10px',flexGrow: 1}}>
+                                            <div style={{display:'flex',justifyContent:'space-between',width:'100%'}}>
+                                              <div style={{fontSize:'20PX',fontWeight:'700'}}>
+                                                {attraction.name}
+                                              </div>
+                                              
+                                            </div>
+                                            <div style={{fontSize:'13px'}}>{attraction.address}</div>
+                                          </div>
+                                          <span style={{}} onClick={()=>handleDel(attractionindex,dateindex)}>×</span>
+                                          
+                                        </div>  
                                     </div>
                                     {attractionindex < date.attractions.length - 1 && (
                                         <div style={{borderLeft: '2px dashed #666666ff',height:'50px',marginLeft:'50px',display:'flex',alignItems:'center'  }}>
@@ -252,17 +270,16 @@ interface Mymap{
 function Mymap({record,searchMarker,setTravelTimes}:Mymap){
     const [center, setcenter] = useState(record ? record.coordinates : { lat:  0, lng:  0 });
     const [dateRange, setDateRange] = useState(record ? record.dateRange :[]);
-    
+    //const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     useEffect(() => {
         if (record) {
-            
             setDateRange(record.dateRange);
         }
     }, [record]);
     
     
         return(
-            <APIProvider apiKey={"AIzaSyDhfLh8axPm0TpZASZ4EbUV4b4D2shqJKE"} >
+            <APIProvider apiKey={`${apiKey}`} >
               <Map
                   style={{flex: 3,height:"calc(100vh - 66.5px)" }}
                   defaultCenter={center}
@@ -292,14 +309,24 @@ function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:searchP
     const[place,setPlace]=useState('')
     const [placeCoordinates, setPlaceCoordinates] = useState<{ lat: number | null, lng: number | null }>({ lat: null, lng: null });
     const [countryCode,setCountryCode]= useState(record?record.countryCode:'')
-    
+    const[placeId,setPlaceId]=useState('')
+  
+
+
     const handleSearchPlace =async () => {
       try {
-        const coordinates = await getCoordinates(place,countryCode);
+        const placeinfo = await getCoordinates(place,countryCode);
+        const coordinates=placeinfo.coordinates
+        const placeId= placeinfo.placeId
+        setPlaceId(placeId)
+       
+        
+        
         if (coordinates.lat === null || coordinates.lng === null) {
+          console.log('Latitude or Longitude is null');
             throw new Error("查無景點");
         }
-        
+        //const details = await placeDetailInfo(placeId);
         setPlaceCoordinates(coordinates);
         setSearchMarker(coordinates);
     } catch (error) {
@@ -309,83 +336,261 @@ function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:searchP
          
     };
 
-    const handleAddPlace = async() =>{
-      if (placeCoordinates.lat === null || placeCoordinates.lng === null) {
-        alert("查無景點");
-        return;
-    }
-        const newPlace: Attraction = {
-          name: place,
-          coordinates: {
-              lat: placeCoordinates.lat, 
-              lng: placeCoordinates.lng, 
-          },
-      };
-        
-        
-        try {
-            const user = auth.currentUser;
-            if (!user) {
-                throw new Error('用戶未登錄');
-            }
-            
-            const url = window.location.href.split("/");
-            const recordid = url[5];
-            
-            const docRef = doc(db, 'record', recordid); //創建文件引用
-
-            const docSnap = await getDoc(docRef);//獲取數據
-
-            if(docSnap.exists()){
-                const dateRange: DateRangeItem[]  =docSnap.data().dateRange;
-               
-                dateRange.forEach(element => {
-                    if(element.date==selectedDay){
-                        element.attractions.push(newPlace)   
-                    }
-                });
-                await updateDoc(docRef, { dateRange });
-            }
-            
-           
+   
+/*
+    async function placeDetailInfo(placeId:string){
+      
+      console.log(placeId);
+      
     
-            // 清空選擇的景點與日期
-            setPlace("");
-            setPlaceCoordinates({ lat: null, lng: null });
-            setSelectedDay("");
-            setSearchMarker(null)
-            
-        } catch (error) {
-            console.error("更新資料失敗：", error);
-        }
-    }
+    }*/
+
 
     function back(){
         setPlace("");
         setPlaceCoordinates({ lat: null, lng: null });
         setSelectedDay("");
+        setSearchMarker(null)
+
     }
 
 
 
     return(
-        <div style={{flex: 2,overflowY: 'auto',height:"calc(100vh - 66.5px)" }}>
-            <div style={{margin:'40px 20px'}}>
-                <div style={{marginBottom:'40px'}} onClick={back}>←  回上頁</div>
-                <input 
-                    type="text" 
-                    placeholder="輸入景點"  
-                    onChange={(e)=>{setPlace(e.target.value)}}
-                    value={place}
-                />
-                <button onClick={handleSearchPlace}>搜尋景點</button>   
-                {placeCoordinates.lat !== null && placeCoordinates.lng !== null && (
-                <button onClick={handleAddPlace}>加入行程</button>
-            )}
+      <APIProvider apiKey={`${apiKey}`}>
+          <div style={{flex: 2,overflowY: 'auto',height:"calc(100vh - 66.5px)" }}>
+            <div style={{margin:'40px auto',width:'90%'}}>
+                <div style={{marginBottom:'20px',color:'#999999ff',fontSize:'18px',fontWeight:'600'}} onClick={back}>←  回上頁</div>
+
+                <div style={{display:'flex',margin:'0 auto'}}>
+                    <input 
+                      type="text" 
+                      placeholder="輸入景點"  
+                      onChange={(e)=>{setPlace(e.target.value)}}
+                      value={place}
+                      className={styles.search_input}
+                    />
+                    <div style={{
+                          width:'15%',
+                          height:'45px',
+                          border: '2px solid #ea9999ff',
+                          borderRadius:'5px',
+                          borderTopRightRadius: '5px',
+                          borderBottomRightRadius: '5px',
+                          borderTopLeftRadius: '0',
+                          borderBottomLeftRadius: '0',
+                          display:'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor:'#ea9999ff',
+                          cursor:'pointer'
+                        }}
+                        onClick={handleSearchPlace}>
+                        <Image  width={22} height={22} src={searchImg} alt="search" />
+                    </div>
+                
+                </div>
+                
+                {placeId && (
+                  <Placeinformation placeId={placeId} selectedDay={selectedDay} placeCoordinates={placeCoordinates} setPlaceCoordinates={setPlaceCoordinates}  setSearchMarker={ setSearchMarker} setSelectedDay={setSelectedDay} ></Placeinformation>
+                 )}
             </div>
                  
         </div>
+      </APIProvider>
+        
     )
+}
+interface placeinformation{
+  placeId:string,
+  setPlaceCoordinates:React.Dispatch<React.SetStateAction<{
+      lat: number | null;
+      lng: number | null;
+  }>>,
+  setSearchMarker:React.Dispatch<React.SetStateAction<{
+    lat: number;
+    lng: number;
+  } | null>>,
+  setSelectedDay:React.Dispatch<React.SetStateAction<string>>;
+  placeCoordinates:{ lat: number | null, lng: number | null }
+  selectedDay:string
+
+}
+
+
+function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates,setSearchMarker, selectedDay, setSelectedDay}: placeinformation){
+  const [placeDetails, setPlaceDetails] =  useState<google.maps.places.PlaceResult | null>(null);
+  const [photoUrl, setPhotoUrl] = useState('');
+  //const map = useMap();
+  console.log(selectedDay);
+  
+  const placesLib = useMapsLibrary('places');
+  console.log(placeId);
+  //const service = new google.maps.places.PlacesService(document.createElement('div'));
+  useEffect(() => {
+    
+    console.log("placesLib:", placesLib);
+    if (!placesLib ) {
+      console.log("Maps library or map is not available yet");
+      return;
+    }
+    console.log("有資料");
+
+    const service = new placesLib.PlacesService(document.createElement('div'));
+    const request = {
+      placeId: placeId,
+      fields: [
+        'name', 'formatted_address',  'photos','formatted_phone_number',
+        'opening_hours', 'website', 'rating', 
+      ]
+    };
+
+    service.getDetails(request, (place, status) => {
+      if (status === placesLib.PlacesServiceStatus.OK) {
+        console.log(place);
+        
+        if(place){
+          setPlaceDetails(place)
+          const photos = place.photos;
+          if (photos && photos.length > 0) {
+            const photoUrl = photos[0].getUrl({ maxWidth: 400, maxHeight: 400 });
+            setPhotoUrl(photoUrl);
+            console.log(photoUrl);
+          }
+        }
+      } else {
+        console.error('Details not found');
+      }
+    });
+  }, [placeId,  placesLib]);
+
+  const handleAddPlace = async() =>{
+     /* if (placeCoordinates.lat === null || placeCoordinates.lng === null) {
+      alert("查無景點");
+      return;
+    }*/
+
+      if (!placeDetails || !placeDetails.name || !placeDetails.formatted_address || !placeCoordinates.lat || !placeCoordinates.lng || !photoUrl) {
+       
+        return; // 停止執行，如果有資料為空
+      }
+      const newPlace: Attraction = {
+        name:placeDetails.name,
+        coordinates: {
+            lat: placeCoordinates.lat, 
+            lng: placeCoordinates.lng, 
+        },
+        address:placeDetails.formatted_address,
+        picture:photoUrl
+    };
+      
+      
+      try {
+          const user = auth.currentUser;
+          if (!user) {
+              throw new Error('用戶未登錄');
+          }
+          
+          const url = window.location.href.split("/");
+          const recordid = url[5];
+          const docRef = doc(db, 'record', recordid); //創建文件引用
+          const docSnap = await getDoc(docRef);//獲取數據
+          if(docSnap.exists()){
+              const dateRange: DateRangeItem[]  =docSnap.data().dateRange;
+              console.log(dateRange);
+              console.log(selectedDay);
+              
+              dateRange.forEach(element => {
+                  if(element.date==selectedDay){
+                      element.attractions.push(newPlace)   
+                  }
+              });
+              await updateDoc(docRef, { dateRange });
+          }
+          
+         
+  
+          // 清空選擇的景點與日期
+          
+          setPlaceCoordinates({ lat: null, lng: null });
+          setSelectedDay("");
+          setSearchMarker(null)
+          
+      } catch (error) {
+          console.error("更新資料失敗：", error);
+      }
+  }
+
+
+
+
+  return(
+    <div>
+      {placeDetails?(
+        <div style={{width:'100%',minHeight:'400px',marginTop:'30px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'}}>
+            <div style={{fontSize:'25px',fontWeight:700,padding:'10px', color:'#434343ff'}}>{placeDetails.name}</div>
+            <div style={{fontSize:'15px',paddingLeft:'10PX',color:'#999999ff'}}>{placeDetails.formatted_address}</div>
+            <div>
+              <img style={{width:'100%',height:'330px',overflow:'hidden',paddingTop:'20PX'}} src={photoUrl}></img>
+            </div>
+
+
+            {
+              placeDetails.opening_hours&&(
+                <div style={{ display: 'flex', alignItems: 'flex-start', paddingLeft: '10px', paddingTop: '10px' }}>
+                    <Image width={20} height={20} src={openImg} alt="open" style={{marginTop: '5px'}} />
+                    <div style={{ whiteSpace: 'pre-line', paddingLeft: '10px' }}>
+                        {
+                            placeDetails.opening_hours.weekday_text?.map((text, index)=>{
+                              const [day, time] = text.split(': ');
+                              return(
+                                <div style={{ fontSize: '15px', marginTop: '5px' }} key={index}>
+                                  <span style={{ marginRight: '15px', fontSize: '16px', fontWeight: 700, color: '#999999ff' }}>{day}</span>
+                                  <span style={{ color: '#666666ff' }}>{time}</span>
+                                </div>
+                              )
+                            })
+                        }
+                    </div>
+                </div>
+              )
+            }
+
+            {
+                placeDetails.formatted_phone_number &&(
+                  <div style={{paddingTop:'20px',paddingLeft:'10px',display:'flex'}}>
+                    <Image width={20} height={20} src={phoneImg} alt="phone"  style={{marginRight:'10px'}} />
+                    <span style={{color:'#666666ff'}}>{placeDetails.formatted_phone_number}</span>
+                  </div>
+                )
+              }
+
+            
+            {
+              placeDetails.website &&(
+              <div style={{paddingTop:'20px',paddingLeft:'10px'}}>
+                <div style={{display:'flex',alignItems:'center'}}> 
+                  <Image width={20} height={20} src={webImg} alt="web" style={{marginRight:'10px'}} />
+                  <a href={placeDetails.website} target="_blank" rel="noopener noreferrer" style={{color:'#ea9999ff',fontSize:'16px',wordBreak: 'break-all', maxWidth: '90%',whiteSpace: 'normal'}}>{placeDetails.website}</a>
+                </div>
+              </div>
+              )
+            }
+            
+            <button onClick={handleAddPlace} style={{fontWeight:'600',fontSize:'17px',backgroundColor:'#ea9999ff',border:'0px',color:'white',borderRadius:'3px',margin:'20px',height:'35px',marginLeft:'400px',cursor:'pointer'}}>加入行程</button>
+            
+           
+          </div>
+      ):(
+        <div>loading</div>
+      )}
+          
+        
+     
+    </div>
+    
+    
+  )
 }
 
 
@@ -393,17 +598,22 @@ function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:searchP
 async function  getCoordinates(address:string,countryCode:string) {
   console.log(countryCode);
   
-    const apiKey = "AIzaSyDhfLh8axPm0TpZASZ4EbUV4b4D2shqJKE";
+   
     const encodedCity = encodeURIComponent(address);
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedCity}&region=${countryCode}&key=${apiKey}`;
 
     const response = await fetch(url);
     const data = await response.json();
-    
+   // console.log(data.results[0].place_id);
+    const placeId=data.results[0].place_id
     const location = data.results[0].geometry.location;
     return {
-      lat: location.lat,
-      lng: location.lng
+      coordinates:{
+        lat: location.lat,
+        lng: location.lng
+      },
+      placeId:placeId
+      
     };
   }
 
@@ -418,7 +628,7 @@ interface mapcontent{
 function MapContent({ dateRange,searchMarker,setTravelTimes }:mapcontent) {
   const map = useMap();
   const maps = useMapsLibrary("maps") ;
-  const routes = useMapsLibrary("routes");
+  
   const flightPathsRef = useRef<google.maps.Polyline[]>([]);
   
   useEffect(() => {
@@ -545,3 +755,4 @@ function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes
     }, [routes, dateRange]);
   }
   
+
