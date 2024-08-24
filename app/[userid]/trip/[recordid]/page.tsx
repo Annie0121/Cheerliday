@@ -68,7 +68,7 @@ export default function Home(){
         <div style={{ display: 'flex', width: '100%',alignItems: 'flex-start',height:"calc(100vh - 70px)"   }}>
             {selectedDay?
             (< SearchPlace record={record} setSelectedDay={setSelectedDay} selectedDay={selectedDay} setSearchMarker={setSearchMarker}></SearchPlace>)
-            :<Schedule setSelectedDay={setSelectedDay} record={record} travelTimes={travelTimes}></Schedule>}
+            :<Schedule setSelectedDay={setSelectedDay} record={record} travelTimes={travelTimes} setRecord={setRecord}></Schedule>}
             <Mymap record={record} searchMarker={searchMarker} setTravelTimes={setTravelTimes}></Mymap> 
         </div>
             
@@ -95,6 +95,7 @@ interface Schedule{
   record:Record,
   setSelectedDay:React.Dispatch<React.SetStateAction<string>>,
   travelTimes: { [key: string]: string };
+  setRecord:React.Dispatch<any>
 }
 
 interface Attraction {
@@ -108,7 +109,7 @@ interface DateRangeItem {
   attractions: Attraction[];
 }
 
-function Schedule({record,setSelectedDay,travelTimes}:Schedule){
+function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
     const [name, setname] = useState(record ? record.name : "");
     const[startdate,setstartdate]=useState(record ? record.startdate : "");
     const[enddate,setenddate]=useState(record ? record.enddate : "");
@@ -182,8 +183,14 @@ function Schedule({record,setSelectedDay,travelTimes}:Schedule){
           console.error( error);
       }
       
-      
+      setRecord((preRecord: any)=>({
+        ...preRecord,
+        dateRange:updatedDateRange
+      }))
+
+
     }
+
     return(
         <div style={{flex: 2,overflowY: 'auto',height:"calc(100vh - 66.5px)" }}>
             <div style={{width:'100%'}}>
