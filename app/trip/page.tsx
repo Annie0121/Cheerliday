@@ -273,7 +273,7 @@ const generateDateRange = (start: dayjs.Dayjs|null, end: dayjs.Dayjs|null): Date
     const endDate = dayjs(end);
   
     while (currentDate.isBefore(endDate) || currentDate.isSame(endDate, 'day')) {
-      dateRange.push({ date: currentDate.format('MM月DD日'), attractions: [] });
+      dateRange.push({ date: currentDate.format('M月D日'), attractions: [] });
       currentDate = currentDate.add(1, 'day');
     }
   

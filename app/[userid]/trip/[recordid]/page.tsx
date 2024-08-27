@@ -1,7 +1,7 @@
 "use client"
 import { db, auth } from '@/app/firebase';
 import {onAuthStateChanged, User} from "firebase/auth"
-import {APIProvider, Map,Marker,useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import {APIProvider, Map,Marker,useMap, useMapsLibrary,AdvancedMarker,Pin } from '@vis.gl/react-google-maps';
 import React, { useEffect, useState ,useRef} from 'react';
 import { doc, updateDoc,collection, setDoc,getDoc, onSnapshot , query, where,getDocs,deleteDoc } from "firebase/firestore"; 
 import { useRouter } from "next/navigation";
@@ -13,7 +13,7 @@ import openImg from './open.png'
 import webImg from './web.png'
 import phoneImg from './phone.png'
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-
+const colors=['#d05b6eff ',"#45818eff","#c1683cff","#a64d79ff","#a28c37ff","#8075b5ff","#6aa84fff"]
 export default function Home(){
     const [user, setUser] = useState<any>(null);
     const [record, setRecord] = useState<any>(null);
@@ -183,7 +183,7 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
           console.error( error);
       }
       
-      setRecord((preRecord: any)=>({
+      setRecord((preRecord:any)=>({
         ...preRecord,
         dateRange:updatedDateRange
       }))
@@ -197,28 +197,28 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
                 <div style={{fontSize:'35px',fontWeight:700,margin:'20PX'}}>{name}</div>
                 <div style={{fontSize:'20px',fontWeight:700,margin:'20PX'}}>{startdate} ~ {enddate}</div>
                 <div style={{display:'flex',marginTop:'20PX',width:'100%',justifyContent:'space-between',height:'50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'}}>
-                    <div style={{width:'40px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',fontSize:'30px',textAlign:'center',paddingTop:'5PX'}} onClick={listLeft}>&lt;</div>
+                    <div style={{width:'40px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',fontSize:'30px',textAlign:'center',paddingTop:'5PX',color:'#ea9999ff'}} onClick={listLeft}>&lt;</div>
                     <div style={{ width: 'calc(100% - 80px)',display: 'flex',overflow: 'hidden'}} ref={myRef}>
                         {dateRange.map((date, index:number) => (
                         <div key={index} 
-                            style={{ width: '100px', border: '1px solid #efefefff', textAlign: 'center', alignContent: 'center', flexShrink: '0', }}
+                            className={styles.date_bar}
                             onClick={()=>getdate(index)}>
                             {date.date}
-                            <div  >第{index+1}天</div>
+                            <div style={{color:'#666666ff',fontWeight:'400',fontSize:'14PX'}} >第{index+1}天</div>
                         </div>
                         ))}
                     </div>
-                    <div style={{width:'40px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',fontSize:'30px',textAlign:'center',paddingTop:'5PX'}} onClick={listRight}>&gt;</div>
+                    <div style={{width:'40px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',fontSize:'30px',textAlign:'center',paddingTop:'5PX',color:'#ea9999ff'}} onClick={listRight}>&gt;</div>
                 </div>
             </div>
             <div style={{backgroundColor:'#efefefff',paddingTop:'20PX',paddingBottom:'40px'}}> 
                 {dateRange.map((date,dateindex)=>(
                     <React.Fragment key={dateindex} >
+                        
                         <div style={{display:'flex',margin:'35px 10px'}}>
                             <div 
-                                style={{width:'65px',backgroundColor:'#999999ff',marginLeft:'10px',height:'30px',fontSize:'20px',padding:'5px',borderRadius:'6px',fontWeight:'600',color:'white', alignItems:'center',textAlign:'center'}}
-                                ref={el => {dateRef.current[dateindex] = el}}
-                                >  
+                                style={{width:'65px',backgroundColor:colors[dateindex % colors.length],marginLeft:'10px',height:'30px',fontSize:'20px',padding:'5px',borderRadius:'6px',fontWeight:'600',color:'white', alignItems:'center',textAlign:'center'}}
+                                ref={el => {dateRef.current[dateindex] = el}}>  
                                 第{dateindex+1}天
                             </div>
                             <p style={{height:'30px',display: 'flex', alignItems:'center',justifyItems:'center',margin:'5px',marginLeft:'70%'}}>
@@ -236,12 +236,10 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
                                               <div style={{fontSize:'20PX',fontWeight:'700'}}>
                                                 {attraction.name}
                                               </div>
-                                              
                                             </div>
                                             <div style={{fontSize:'13px'}}>{attraction.address}</div>
                                           </div>
                                           <span style={{}} onClick={()=>handleDel(attractionindex,dateindex)}>×</span>
-                                          
                                         </div>  
                                     </div>
                                     {attractionindex < date.attractions.length - 1 && (
@@ -257,10 +255,13 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
                                 </React.Fragment>
                             ))  
                         )}
-                        <div style={{width: '50px',height: '50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',borderRadius:' 50%',display: 'flex',alignItems: 'center',justifyContent: 'center',backgroundColor: 'white',margin:'30px 100px'}}
-                        onClick={() => addplace(date.date)}>
-                            <span>+</span>
-                        </div> 
+                        <div style={{margin:'30px 100px',width:'70px',height:'80px',display: 'grid', placeItems: 'center'}}>
+                            <div style={{width: '50px',height: '50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',borderRadius:' 50%',display: 'flex',alignItems: 'center',justifyContent: 'center',backgroundColor: 'white',cursor:'pointer',fontSize:'35px'}}
+                          onClick={() => addplace(date.date)}>
+                              +
+                          </div> 
+                          <div style={{marginTop:'10PX',fontWeight:'600',color:'#666666ff'}}>加入景點</div>
+                        </div>
                     </React.Fragment>
                 ))} 
             </div>
@@ -275,27 +276,47 @@ interface Mymap{
 
 
 function Mymap({record,searchMarker,setTravelTimes}:Mymap){
-    const [center, setcenter] = useState(record ? record.coordinates : { lat:  0, lng:  0 });
+    const [center, setcenter] =  useState<Coordinates | null>(null);
     const [dateRange, setDateRange] = useState(record ? record.dateRange :[]);
-    //const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const [zoom, setZoom] = useState<number | null>(null);
+    
     useEffect(() => {
         if (record) {
             setDateRange(record.dateRange);
         }
     }, [record]);
+
+   useEffect(() => {
+      if (searchMarker) {
+        setcenter(searchMarker);
+        setZoom(17); // 設置適當的縮放級別
+      } else {
+        setcenter(null);
+        setZoom(null); // 恢復到 defaultZoom
+      }
+    }, [searchMarker]);
     
+    console.log(searchMarker);
     
         return(
             <APIProvider apiKey={`${apiKey}`} >
               <Map
                   style={{flex: 3,height:"calc(100vh - 66.5px)" }}
-                  defaultCenter={center}
-                  defaultZoom={12}
+                  defaultCenter={record ? record.coordinates : { lat:  0, lng:  0 }}
+                  defaultZoom={13}
                   gestureHandling={'greedy'}
                   disableDefaultUI={true}
                   mapId='842bf081f72c1734'
+                  center={center }
+                  zoom={zoom }
+                  key={searchMarker ? 'focused' : 'default'}
               >
-                    <MapContent  dateRange={dateRange} searchMarker={searchMarker} setTravelTimes={setTravelTimes} />
+                    <MapContent  
+                      dateRange={dateRange} 
+                      searchMarker={searchMarker} 
+                      setTravelTimes={setTravelTimes} 
+                      
+                    />
               </Map>
             </APIProvider>
             )
@@ -647,42 +668,41 @@ function MapContent({ dateRange,searchMarker,setTravelTimes }:mapcontent) {
       if (!flightPath) {
         flightPath = new maps.Polyline({
           geodesic: true,
-          strokeColor: "#FF0000",
-          strokeOpacity: 0.3,
-          strokeWeight: 3,
+          strokeColor: colors[index % colors.length],
+          strokeOpacity: 0.6,
+          strokeWeight: 4,
         });
         flightPath.setMap(map);
         flightPathsRef.current[index] = flightPath;
       }
-  
       const coordinates = date.attractions.map(attraction => attraction.coordinates);
       flightPath.setPath(coordinates);
     });
   }, [map, maps, dateRange]);
-
-
-
   useCalculateTravelTimes({dateRange,setTravelTimes})
-    
-
-
-
   return (
     <>
       {dateRange.map((date, index) => (
         date.attractions.map((attraction, i) => (
-          <Marker
+          <AdvancedMarker
             key={`${index}-${i}`}
             position={attraction.coordinates}
-            label={`${i+1}`}
-          />
+          >
+            <Pin
+              background={colors[index % colors.length]}
+              glyphColor={'#ffffffff'}
+              borderColor={'#ffffffff'}
+              glyph={`${i + 1}`} 
+              
+              
+            />
+          </AdvancedMarker>
         ))
       ))}
       {searchMarker && (
-              <Marker
-                  position={searchMarker}
-              >
-              </Marker>
+              <AdvancedMarker position={searchMarker}>
+              <Pin background={'red'} glyphColor={'#000'} borderColor={'#000'}  />
+            </AdvancedMarker>
       )
       }
       
@@ -690,7 +710,6 @@ function MapContent({ dateRange,searchMarker,setTravelTimes }:mapcontent) {
   );
 }
   
-
 interface calculateTravelTimes{
   dateRange: DateRangeItem[];
   setTravelTimes:React.Dispatch<React.SetStateAction<{}>>
@@ -701,16 +720,11 @@ function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes
     
     /*const map = useMap();*/
     const routes = useMapsLibrary("routes");
-  
     useEffect(() => {
-        
         if (!routes) {
             console.log("Routes library is not loaded yet");
             return;
           }
-      
-        
-  
       const service = new routes.DistanceMatrixService();
       const newTravelTimes: { [key: string]: string[] } = {};
   
@@ -719,11 +733,9 @@ function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes
           newTravelTimes[day.date] = [];
           const { attractions } = day;
           if (attractions.length < 2) continue;
-  
           for (let i = 0; i < attractions.length - 1; i++) {
             const origin = attractions[i].coordinates;
             const destination = attractions[i + 1].coordinates;
-  
             try {
               const response = await new Promise((resolve, reject) => {
                 service.getDistanceMatrix(
@@ -736,7 +748,6 @@ function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes
                     if (status === routes.DistanceMatrixStatus.OK) {
                       if (response) {
                         const results = response.rows[0].elements[0];
-                        
                         newTravelTimes[day.date].push(results.duration.text);
                       }resolve(null);
                     } else {
@@ -750,10 +761,7 @@ function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes
               newTravelTimes[day.date].push('計算錯誤');
             }
           }
-  
-          
         }
-  
         setTravelTimes(newTravelTimes)
       };
   

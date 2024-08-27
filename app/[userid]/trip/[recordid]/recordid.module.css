@@ -31,3 +31,18 @@
     font-size: 16px;
     font-weight: 600;
 }
+
+.date_bar{
+    width: 100px;
+    border: 1px solid #efefefff;
+    text-align: center;
+    align-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    color: #4f4f4fff;
+}
+.date_bar:hover{
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
