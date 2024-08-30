@@ -208,7 +208,8 @@ function Plan({onClose}:PlanProps){
             countryCode: citycoordinates.countryCode,
             startdate,
             enddate,
-            dateRange
+            dateRange,
+            
           });
           
           const recordid =docRef.id
@@ -264,7 +265,9 @@ function Plan({onClose}:PlanProps){
 
 interface DateRangeItem {
     date: string;
-    attractions: any[]; // 根據你的需求，可以更改為具體的類型
+    startTime:string;
+    attractions: any[]; 
+    
 }
 
 const generateDateRange = (start: dayjs.Dayjs|null, end: dayjs.Dayjs|null): DateRangeItem[] => {
@@ -273,7 +276,7 @@ const generateDateRange = (start: dayjs.Dayjs|null, end: dayjs.Dayjs|null): Date
     const endDate = dayjs(end);
   
     while (currentDate.isBefore(endDate) || currentDate.isSame(endDate, 'day')) {
-      dateRange.push({ date: currentDate.format('M月D日'), attractions: [] });
+      dateRange.push({ date: currentDate.format('M月D日'),startTime:"8:00", attractions: [] });
       currentDate = currentDate.add(1, 'day');
     }
   

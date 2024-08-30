@@ -7,7 +7,7 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5); /* 半透明的黑色背景 */
     z-index: 1000; 
-    
+
 }
 .dialog{
     width: 340px;

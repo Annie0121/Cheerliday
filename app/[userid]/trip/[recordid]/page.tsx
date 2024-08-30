@@ -12,6 +12,12 @@ import searchImg from './search.png'
 import openImg from './open.png'
 import webImg from './web.png'
 import phoneImg from './phone.png'
+import { Select, Button, Modal } from 'antd';
+
+
+const { Option } = Select;
+import dayjs from 'dayjs';
+
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 const colors=['#d05b6eff ',"#45818eff","#c1683cff","#a64d79ff","#a28c37ff","#8075b5ff","#6aa84fff"]
 export default function Home(){
@@ -22,6 +28,7 @@ export default function Home(){
     const [searchMarker, setSearchMarker] = useState<{ lat: number; lng: number } | null>(null);
     const [travelTimes, setTravelTimes] = useState({});
     const router=useRouter()
+    
 
     //確認用戶登入狀態
     useEffect(()=>{
@@ -89,6 +96,7 @@ interface Record {
   startdate: string;
   userid: string;
   countryCode:string
+  statrTime:string
 }
 
 interface Schedule{
@@ -102,10 +110,12 @@ interface Attraction {
   coordinates: Coordinates;
   name: string;
   address:string,
-  picture:string
+  picture:string,
+  stayDuration: number
 }
 interface DateRangeItem {
   date: string;
+  startTime:string;
   attractions: Attraction[];
 }
 
@@ -115,8 +125,11 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
     const[enddate,setenddate]=useState(record ? record.enddate : "");
     const [dateRange, setDateRange] = useState(record ? record.dateRange :[]);
     //const [selectedDay, setSelectedDay] = useState("");
-    console.log(travelTimes);
-    
+    const [showModal,setshowModal]=useState(false)
+    const [currentDateIndex,setCurrentDateIndex]=useState<number | null>(null);
+    const [AttractionIndex, setAttractionIndex] = useState<number| null>(null);
+    const [selectedDateIndex, setSelectedDateIndex] = useState<number| null>(null);
+    const [calculatedTimes, setCalculatedTimes] = useState<{ [key: string]: { startTime: string, endTime: string }[] }>({});
     //組件渲染後訪問和操作 DOM 元素
     const myRef = useRef<HTMLDivElement>(null);
     //點擊左右
@@ -151,6 +164,49 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
         }
 
     }
+
+
+    useEffect(()=>{
+      if(Object.keys(travelTimes).length >0){
+          const newCalculatedTimes: { [key: string]: { startTime: string, endTime: string }[] } = {};
+          dateRange.forEach((date) => {
+            newCalculatedTimes[date.date] = calculateTimes(date);
+          });
+          setCalculatedTimes(newCalculatedTimes);
+      }
+    },[travelTimes])
+
+  
+        const calculateTimes = (date: DateRangeItem) => {
+          if (Object.keys(travelTimes).length === 0) {
+            return [];
+          }
+        let currentTime = date.startTime;
+        const times :{ startTime: string, endTime: string }[] = [];
+        let currentDate=date.date
+        date.attractions.forEach((attraction:Attraction, index:number) => {
+                let startTime = currentTime; 
+                let endTime = addMinutes(startTime, attraction.stayDuration);
+                if (index < date.attractions.length - 1) {
+                  if(travelTimes[currentDate] && travelTimes[currentDate][index]){
+                      let drivetime = parseInt(travelTimes[currentDate][index].split(" ")[0]);
+                      currentTime = addMinutes(endTime, drivetime); 
+                  }
+                    
+                }
+                times.push({ startTime, endTime }); 
+              
+            });
+        return(times);
+        
+      };
+   
+
+
+
+    
+
+
 
     
     function addplace(date:string){
@@ -212,7 +268,9 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
                 </div>
             </div>
             <div style={{backgroundColor:'#efefefff',paddingTop:'20PX',paddingBottom:'40px'}}> 
-                {dateRange.map((date,dateindex)=>(
+                {dateRange.map((date,dateindex)=>{
+                   const times = calculateTimes(date);
+                    return(
                     <React.Fragment key={dateindex} >
                         
                         <div style={{display:'flex',margin:'35px 10px'}}>
@@ -221,39 +279,74 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
                                 ref={el => {dateRef.current[dateindex] = el}}>  
                                 第{dateindex+1}天
                             </div>
-                            <p style={{height:'30px',display: 'flex', alignItems:'center',justifyItems:'center',margin:'5px',marginLeft:'70%'}}>
+
+                            <div style={{height:'30px',display: 'flex', alignItems:'center',justifyItems:'center',margin:'5px',width:'130px'}}>
+                              <span>出發時間：</span>
+                              <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={()=>{setshowModal(true),setCurrentDateIndex(dateindex)}}>{dateRange[dateindex].startTime}</span>
+                              {
+                                showModal && <TimeComponent dateRange={dateRange} currentDateIndex={currentDateIndex} setDateRange={setDateRange} setshowModal={setshowModal} ></TimeComponent>
+                              }
+                            </div>
+                            
+                            <p style={{height:'30px',display: 'flex', alignItems:'center',justifyItems:'center',margin:'5px',marginLeft:'45%'}}>
                               {date.date}
                             </p>
                         </div>
+                        
                         {date.attractions && date.attractions.length > 0 && (
-                            date.attractions.map((attraction, attractionindex) => (
-                                <React.Fragment key={attractionindex}>
-                                    <div  style={{width:'100%',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 -4px 6px rgba(0, 0, 0, 0.1)',backgroundColor:'white',height:'130px', display:'flex',justifyContent:'center',alignItems:'center'}}>
-                                        <div style={{display:'flex',height:'80px',width:'95%'}}>
-                                          <img style={{height:'80px',width:'80px',overflow:'hidden'}} src={attraction.picture}></img>
-                                          <div style={{marginLeft:'10px',flexGrow: 1}}>
-                                            <div style={{display:'flex',justifyContent:'space-between',width:'100%'}}>
-                                              <div style={{fontSize:'20PX',fontWeight:'700'}}>
-                                                {attraction.name}
+                            date.attractions.map((attraction, attractionindex) => {
+                              
+                                return(
+                                  <React.Fragment key={attractionindex}>
+                                      <div  style={{width:'100%',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 -4px 6px rgba(0, 0, 0, 0.1)',backgroundColor:'white',height:'130px', display:'flex',justifyContent:'center',alignItems:'center'}}>
+                                          <div style={{display:'flex',height:'80px',width:'95%'}}>
+                                            <img style={{height:'80px',width:'80px',overflow:'hidden'}} src={attraction.picture}></img>
+
+                                            <div style={{marginLeft:'10px',flexGrow: 1}}>
+                                              <div style={{display:'flex',height:'20px',width:'180px'}}>
+                                                  <div onClick={()=>{setAttractionIndex(attractionindex);setSelectedDateIndex(dateindex)}} style={{ alignSelf: 'flex-end',fontSize:'13px',textDecoration:'underline',fontWeight:'800',textUnderlineOffset: '3px',cursor:'pointer',color:'#d05b6eff'}}>
+                                                    {Math.floor(attraction.stayDuration / 60)} 小時 {attraction.stayDuration % 60} 分鐘
+                                                  </div>
+
+                                                  <div style={{fontSize:'13px',marginLeft:'5PX', alignSelf: 'flex-end',color:'#666666ff'}}>|</div>
+
+                                                  <div style={{fontSize:'13px',marginLeft:'5PX', alignSelf: 'flex-end',color:'#666666ff',fontWeight:'600'}}>
+                                                  {times && times[attractionindex] ? `${times[attractionindex].startTime} - ${times[attractionindex].endTime}` : ""}
+                                                  </div>
                                               </div>
-                                            </div>
-                                            <div style={{fontSize:'13px'}}>{attraction.address}</div>
-                                          </div>
-                                          <span style={{}} onClick={()=>handleDel(attractionindex,dateindex)}>×</span>
-                                        </div>  
-                                    </div>
-                                    {attractionindex < date.attractions.length - 1 && (
-                                        <div style={{borderLeft: '2px dashed #666666ff',height:'50px',marginLeft:'50px',display:'flex',alignItems:'center'  }}>
-                                           {travelTimes[date.date] && travelTimes[date.date][attractionindex] && (
-                                                <div style={{ margin: '10px',display:'flex' }}>
-                                                  <div style={{marginRight:'10px'}}>約 {travelTimes[date.date][attractionindex]} </div>
-                                                  <Image width={20} height={20} src={carImage} alt="Car" />
+                                              {
+                                                AttractionIndex !== null && selectedDateIndex !== null && 
+                                                (<DurationComponent  
+                                                  selectedDateIndex={selectedDateIndex} 
+                                                  dateRange={dateRange} 
+                                                  setDateRange={setDateRange} 
+                                                  AttractionIndex={AttractionIndex} 
+                                                  setAttractionIndex={setAttractionIndex} 
+                                                />) 
+                                              }
+                                              <div style={{display:'flex',justifyContent:'space-between',width:'100%'}}>
+                                                <div style={{fontSize:'17PX',fontWeight:'900',marginTop:'8PX',}}>
+                                                  {attraction.name}
                                                 </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </React.Fragment>
-                            ))  
+                                              </div>
+                                              <div style={{fontSize:'13px',marginTop:'3PX',color:'#6a6969ff',fontWeight:'500'}}>{attraction.address}</div>
+                                            </div>
+                                            <span style={{}} onClick={()=>handleDel(attractionindex,dateindex)}>×</span>
+                                          </div>  
+                                      </div>
+                                      {attractionindex < date.attractions.length - 1 && (
+                                          <div style={{borderLeft: '2px dashed #666666ff',height:'50px',marginLeft:'50px',display:'flex',alignItems:'center'  }}>
+                                            {travelTimes[date.date] && travelTimes[date.date][attractionindex] && (
+                                                  <div style={{ margin: '10px',display:'flex' }}>
+                                                    <div style={{marginRight:'10px'}}>約 {travelTimes[date.date][attractionindex]} </div>
+                                                    <Image width={20} height={20} src={carImage} alt="Car" />
+                                                  </div>
+                                              )}
+                                          </div>
+                                      )}
+                                  </React.Fragment>
+                                  )
+                            })  
                         )}
                         <div style={{margin:'30px 100px',width:'70px',height:'80px',display: 'grid', placeItems: 'center'}}>
                             <div style={{width: '50px',height: '50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',borderRadius:' 50%',display: 'flex',alignItems: 'center',justifyContent: 'center',backgroundColor: 'white',cursor:'pointer',fontSize:'35px'}}
@@ -262,8 +355,8 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
                           </div> 
                           <div style={{marginTop:'10PX',fontWeight:'600',color:'#666666ff'}}>加入景點</div>
                         </div>
-                    </React.Fragment>
-                ))} 
+                    </React.Fragment>)
+                })} 
             </div>
         </div>
     )
@@ -289,14 +382,12 @@ function Mymap({record,searchMarker,setTravelTimes}:Mymap){
    useEffect(() => {
       if (searchMarker) {
         setcenter(searchMarker);
-        setZoom(17); // 設置適當的縮放級別
+        setZoom(17); 
       } else {
         setcenter(null);
-        setZoom(null); // 恢復到 defaultZoom
+        setZoom(null); 
       }
     }, [searchMarker]);
-    
-    console.log(searchMarker);
     
         return(
             <APIProvider apiKey={`${apiKey}`} >
@@ -364,16 +455,6 @@ function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:searchP
          
     };
 
-   
-/*
-    async function placeDetailInfo(placeId:string){
-      
-      console.log(placeId);
-      
-    
-    }*/
-
-
     function back(){
         setPlace("");
         setPlaceCoordinates({ lat: null, lng: null });
@@ -381,8 +462,6 @@ function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:searchP
         setSearchMarker(null)
 
     }
-
-
 
     return(
       <APIProvider apiKey={`${apiKey}`}>
@@ -509,7 +588,8 @@ function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates,setSea
             lng: placeCoordinates.lng, 
         },
         address:placeDetails.formatted_address,
-        picture:photoUrl
+        picture:photoUrl,
+        stayDuration: 60
     };
       
       
@@ -717,8 +797,6 @@ interface calculateTravelTimes{
 
 //交通時間
 function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes) {
-    
-    /*const map = useMap();*/
     const routes = useMapsLibrary("routes");
     useEffect(() => {
         if (!routes) {
@@ -770,4 +848,154 @@ function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes
     }, [routes, dateRange]);
   }
   
+  interface timecomponent{
+    setshowModal:React.Dispatch<React.SetStateAction<boolean>>,
+    dateRange:DateRangeItem[],
+    setDateRange:React.Dispatch<React.SetStateAction<DateRangeItem[]>>,
+    currentDateIndex:number|null
+  }
 
+
+
+  /* 出發時間輸入框*/
+ const TimeComponent = ({setshowModal,dateRange,setDateRange,currentDateIndex}:timecomponent) => {
+  const [period, setPeriod] = useState('AM');
+  const [hour, setHour] = useState(8);
+  const [minute, setMinute] = useState(0);
+
+  const handleSubmit = async() => {
+    let adjustedHour = hour;
+    let time
+    if(period == 'PM'  && hour !== 12){
+      adjustedHour+=12;
+    }else if (period === 'PM' && hour === 12){
+      adjustedHour-=12
+    }
+    time=`${adjustedHour === 0 ? '00' : adjustedHour}:${minute < 10 ? `0${minute}` : minute}`
+    
+    setshowModal(false)
+    const url=window.location.href.split("/")
+    let recordId=url[5];
+    const recordRef = doc(db, "record", recordId); 
+    let updatedDateRange = [...dateRange];
+    
+    setDateRange(updatedDateRange);
+    if(currentDateIndex!==null){
+        updatedDateRange[currentDateIndex].startTime = time;
+        try {
+          await updateDoc(recordRef, {
+            dateRange: updatedDateRange
+          });
+      } catch (error) {
+          console.error( error);
+      }
+    }
+     
+
+
+
+  };
+
+  return (
+    <div className={styles.dialog_background}>
+        <div className={styles.dialog}>
+          <div style={{marginBottom:'30PX'}}>出發時間：</div>
+
+          <Select value={period} onChange={(value)=>{setPeriod(value)}} style={{ width: 80, marginRight: 8 }}>
+            <Option value="AM">AM</Option>
+            <Option value="PM">PM</Option>
+          </Select>
+
+          <Select value={hour} onChange={(value)=>{setHour(value);}} style={{ width: 80, marginRight: 8 }}>
+            {Array.from({ length: 12 }, (_, i) => (
+              <Option key={i + 1} value={i + 1}>{i + 1}</Option>
+            ))}
+          </Select>
+
+          <Select value={minute} onChange={(value)=>{setMinute(value);}} style={{ width: 80, marginRight: 8 }}>
+            {Array.from({ length: 60 }, (_, i) => (
+              <Option key={i} value={i}>{i < 10 ? `0${i}` : i}</Option>
+            ))}
+          </Select>
+
+          <div style={{marginTop:'40px',width:'250px',textAlign:'end'}}>
+                    <button onClick={()=>{setshowModal(false)}} style={{ all: 'unset',color:'#666666',marginRight:'25px',fontSize:'17px',cursor:'pointer',}} >取消</button>
+                    <button  onClick={ handleSubmit} style={{width:'50px',height:'30px',fontWeight:'500',fontSize:'17px',backgroundColor:'#ea9999ff',border:'0px',color:'white',borderRadius:'4px',cursor:'pointer'}}>完成</button>
+          </div>
+        </div>
+    </div>
+    
+  );
+  };
+
+  interface durationcomponent{
+    AttractionIndex:number,
+    setAttractionIndex:React.Dispatch<React.SetStateAction<number | null>>,
+    dateRange:DateRangeItem[],
+    setDateRange:React.Dispatch<React.SetStateAction<DateRangeItem[]>>,
+    selectedDateIndex: number 
+  }
+
+
+ const DurationComponent =({AttractionIndex,setAttractionIndex,dateRange,setDateRange,selectedDateIndex}:durationcomponent)=>{
+  const [hour, setHour] = useState(1); 
+  const [minute, setMinute] = useState(0);
+
+  const handleDuration=async()=>{
+   
+    let Duration = hour*60+minute
+    const url=window.location.href.split("/")
+    let recordId=url[5];
+    const recordRef = doc(db, "record", recordId); 
+    let updatedDateRange = [...dateRange];
+    dateRange[selectedDateIndex].attractions[AttractionIndex].stayDuration = Duration;
+    setDateRange(updatedDateRange);
+      try {
+          await updateDoc(recordRef, {
+            dateRange: updatedDateRange
+          });
+          setAttractionIndex(null)
+      } catch (error) {
+          console.error( error);
+      }
+      
+
+
+
+
+  }
+  
+  return(
+    <div className={styles.dialog_background}>
+      <div className={styles.duration_dialog}>
+        <div style={{ marginBottom: '30PX' }}>停留時間：</div>
+        <Select value={hour} onChange={(value)=>setHour(value)} style={{ width: 150, marginRight: 8 }}>
+          {Array.from({ length: 12 }, (_, i) => (
+            <Option key={i} value={i}>{i} 小時</Option>
+          ))}
+        </Select>
+
+        <Select value={minute} onChange={(value)=>{setMinute(value);}} style={{ width: 150 }}>
+          {Array.from({ length: 60 }, (_, i) => (
+            <Option key={i} value={i}>{i} 分鐘</Option>
+          ))}
+        </Select>
+
+        <div style={{ marginTop: '30px', width: '300px', textAlign: 'end' }}>
+          <button onClick={()=>setAttractionIndex(null)} style={{ all: 'unset', color: '#666666', marginRight: '20px', fontSize: '17px', cursor: 'pointer' }}>取消</button>
+          <button onClick={handleDuration} style={{ width: '50px', height: '30px', fontWeight: '500', fontSize: '17px', backgroundColor: '#ea9999ff', border: '0px', color: 'white', borderRadius: '4px', cursor: 'pointer' }}>完成</button>
+        </div>
+      </div>
+    </div>
+  )
+ }
+
+
+ //計算景點時間
+ const addMinutes = (time:string, minutes:number) => {
+  const [hours, mins] = time.split(':').map(Number);
+  const totalMinutes = hours * 60 + mins + minutes;
+  const newHours = Math.floor(totalMinutes / 60) % 24;
+  const newMins = totalMinutes % 60;
+  return `${String(newHours).padStart(2, '0')}:${String(newMins).padStart(2, '0')}`;
+};
