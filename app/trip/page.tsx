@@ -11,12 +11,14 @@ import { log } from 'console';
 const { RangePicker } = DatePicker;
 import { useRouter } from 'next/navigation'
 
+import Image from 'next/image';
 
-
+type ShowPlanFunction = (count: number) => void;
 export default function Home() {
-    
+    const [recordCount, setRecordCount] = useState(0);
     const [plan, setPlan] = useState(false);
-    const ShowPlan=()=>{
+    const ShowPlan: ShowPlanFunction = (count: number)=>{
+        setRecordCount(count);
         setPlan(true)
     }
     const ClosePlan = () => {
@@ -24,13 +26,13 @@ export default function Home() {
       };
 
     return (
-        <>
+        <div style={{ backgroundColor: '#eeeeeeff',boxSizing: 'border-box',overflowY:'auto',height:'100vh',paddingTop:'60PX' }}>
             
                 <Title></Title>
                 <List ShowPlan={ShowPlan}></List>
-                {plan && <Plan onClose={ClosePlan} />}
+                {plan && <Plan onClose={ClosePlan} recordCount={recordCount} />}
            
-        </>
+        </div>
      
   
     );
@@ -41,24 +43,24 @@ export default function Home() {
 function Title(){
     return(
         <>
-            <div style={{fontSize:'28px',margin:'40px auto',width:'90%',textAlign:'center'}}>我的行程總覽</div>
-            <hr style={{width:'90%',margin:"20px auto"}}></hr>
+            <div style={{fontSize:'28px',margin:'40px auto 10px auto',width:'1080px',color:'#525151ff',fontWeight:'600'}}>我的行程</div>
+            <hr style={{width:'1080px',margin:"0 auto",border: '1px solid #a7a6a6ff'}}></hr>
         </>
         
     )
 }
 
 
-
 interface ListProps {
-    ShowPlan: () => void;
+    ShowPlan: (count: number) => void;
 }
-
 
 function List({ShowPlan}:ListProps){
     const [user, setUser] = useState<any>(null);
     const[isLoaded,setIsLoaded]=useState(false)
     const [records, setRecords] = useState<any[]>([]);
+    console.log(records);
+    
     const fetchUserData = async(userId: string) => {
         const q = query(collection(db, "record"), where("userid", "==", userId))
         try {
@@ -66,7 +68,6 @@ function List({ShowPlan}:ListProps){
           const querySnapshot = await getDocs(q);
           const userRecords: any[] = [];
           querySnapshot.forEach((doc) => {
-           
             userRecords.push({ id: doc.id, ...doc.data() });
           });
           setRecords(userRecords)
@@ -101,6 +102,8 @@ function List({ShowPlan}:ListProps){
     
     const planUrl= (userid: string, recordid: string)=>{
         window.location.href = `/${userid}/trip/${recordid}`;
+        router.push(`/${userid}/trip/${recordid}`)
+
     }
     const handleDel=(id:string)=>{
         console.log(id);
@@ -116,30 +119,27 @@ function List({ShowPlan}:ListProps){
 
     return(
         <>
-            <div style={{margin:'20px auto',width:'1080px',textAlign:'end'}}>
-                <button style={{width:'100px',height:'40px',marginRight:'10px'}} onClick={ShowPlan}>新增行程</button>     
+            <div style={{margin:'20px auto 0 auto',width:'1080px',textAlign:'end'}}>
+                <button style={{width:'120px',height:'45px',marginRight:'10px',borderRadius:'5px',backgroundColor:'#ea9999ff',border: '2px solid #ea9999ff',fontSize:'18px',fontWeight:'600',color:'white',cursor:'pointer'}} onClick={() => ShowPlan(records.length)}>+ 新增行程</button>     
             </div>
            
             <div style={{width:'1080px',margin:'20px auto',display:'flex',flexWrap:'wrap'}}>
                 {records.map((data,index)=>(
-                    <div key={data.id} onClick={() => planUrl(user.uid, data.id)} style={{width:'250px',height:'200px',margin: '10px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'}}>
-                        <div style={{height:'120px',backgroundColor:'pink',display:'flex',justifyContent:'space-between'}}>圖片
-                            <div style={{backgroundColor:'white',height:'20px',width:'20px',fontSize:'15px',marginTop:'5PX',display: 'flex', alignItems: 'center', justifyContent: 'center',marginRight:'10px',borderRadius:'50%'}} 
+                    <div key={data.id} onClick={() => planUrl(user.uid, data.id)} style={{width:'250px',height:'200px',margin: '10px',boxShadow: '0 6px 12px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15)',borderRadius:'10px'}}>
+                        <div style={{height:'120px', display:'flex',justifyContent:'flex-end', backgroundImage: `url('/background/${records[index].backgroundImage}')`,backgroundSize: 'cover',borderTopLeftRadius: '10px', borderTopRightRadius: '10px',backgroundPosition: 'center '}}>
+                            <div style={{backgroundColor:'white',height:'20px',width:'20px',fontSize:'16px',marginTop:'5PX',display: 'flex', alignItems: 'center', justifyContent: 'center',marginRight:'10px',borderRadius:'50%'}} 
                                  onClick={(e) => { e.stopPropagation(); handleDel(data.id); }}>×
                             </div>
                         </div>
-                        <div>
-                            <div style={{margin:'10px 10px',fontSize:'18px',fontWeight:700}}>{data.name}</div>
-                            <div style={{margin:'10px 10px',fontSize:'16px',fontWeight:500}}>{data.startdate} - {data.enddate}</div>
+                        <div style={{backgroundColor:'white',paddingTop:'5PX',paddingBottom:'5px',borderBottomLeftRadius: '10px', borderBottomRightRadius: '10px'}} >
+                            <div style={{margin:'10px 10px',fontSize:'19px',fontWeight:'900',color:'#4d4d4dff'}}>{data.name}</div>
+                            <div style={{margin:'10px 10px',fontSize:'14px',fontWeight:'400',color:'#767474ff'}}>{data.startdate} - {data.enddate}</div>
                         </div>
                     </div>
                 ))}
                 
-                
-
-                
-            
             </div>
+           
         </>
         
     )
@@ -147,9 +147,10 @@ function List({ShowPlan}:ListProps){
 
 interface PlanProps {
     onClose: () => void;
+    recordCount:number
 }
 
-function Plan({onClose}:PlanProps){
+function Plan({onClose, recordCount}:PlanProps){
     
     const[name,setName]=useState("")
     const[city,setCity]=useState('')
@@ -182,11 +183,11 @@ function Plan({onClose}:PlanProps){
     async function getPlan() {
         if (!name) {
             setShowNameError(true);
-           
+            return;
         } 
         if (!city) {
             setShowCityError(true);
-            
+            return;
         }
         try {
           const citycoordinates = await getCoordinates(city);
@@ -199,7 +200,8 @@ function Plan({onClose}:PlanProps){
           }
           const userid = user.uid;
           
-          
+          const backgroundImage = `${(recordCount % 8)+1 }.jpg`;
+          console.log(backgroundImage);
           
           const docRef = await addDoc(collection(db, 'record'), {
             userid,
@@ -209,7 +211,7 @@ function Plan({onClose}:PlanProps){
             startdate,
             enddate,
             dateRange,
-            
+            backgroundImage 
           });
           
           const recordid =docRef.id
@@ -306,7 +308,7 @@ async function  getCoordinates(address:string) {
     console.log(data);
     const addressComponents = data.results[0].address_components;
     const location = data.results[0].geometry.location;
-
+    
     let countryCode = "";
     for (let component of addressComponents) {
         if (component.types.includes("country")) {

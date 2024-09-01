@@ -25,8 +25,8 @@ export default function Home() {
 
   return (
     <>
-      <div style={{ position: 'relative'}}>
-        <Image src={homeImage} alt="封面圖片" style={{width:'100%',height:"calc(100vh - 70px)",objectPosition: '50% 65%',objectFit: 'cover',}} priority >
+      <div style={{ position: 'relative',height: '100vh'}}>
+        <Image src={homeImage} alt="封面圖片" style={{width:'100%',height:"calc(100vh - 65px)",objectPosition: '50% 65%',objectFit: 'cover',verticalAlign: 'middle',marginTop:'65px'}} priority >
           
         </Image>
         <div style={{position: 'absolute',top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>

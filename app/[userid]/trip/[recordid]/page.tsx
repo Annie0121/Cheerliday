@@ -72,12 +72,18 @@ export default function Home(){
     }
 
     return(
-        <div style={{ display: 'flex', width: '100%',alignItems: 'flex-start',height:"calc(100vh - 70px)"   }}>
-            {selectedDay?
-            (< SearchPlace record={record} setSelectedDay={setSelectedDay} selectedDay={selectedDay} setSearchMarker={setSearchMarker}></SearchPlace>)
-            :<Schedule setSelectedDay={setSelectedDay} record={record} travelTimes={travelTimes} setRecord={setRecord}></Schedule>}
-            <Mymap record={record} searchMarker={searchMarker} setTravelTimes={setTravelTimes}></Mymap> 
+      <div style={{display:'flex',flexDirection:'column',height:'100vh',overflowY:'hidden'}}>
+        <div style={{display:'flex',height:' calc(100vh - 65px)',marginTop:'65px'}}>
+          
+              {selectedDay?
+              (< SearchPlace record={record} setSelectedDay={setSelectedDay} selectedDay={selectedDay} setSearchMarker={setSearchMarker}></SearchPlace>)
+              :<Schedule setSelectedDay={setSelectedDay} record={record} travelTimes={travelTimes} setRecord={setRecord}></Schedule>}
+              <Mymap record={record} searchMarker={searchMarker} setTravelTimes={setTravelTimes}></Mymap> 
+          
         </div>
+          
+      </div>
+        
             
         
     )
@@ -95,8 +101,9 @@ interface Record {
   name: string;
   startdate: string;
   userid: string;
-  countryCode:string
-  statrTime:string
+  countryCode:string;
+  statrTime:string;
+  backgroundImage:string
 }
 
 interface Schedule{
@@ -201,18 +208,11 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
         
       };
    
-
-
-
-    
-
-
-
-    
     function addplace(date:string){
         setSelectedDay(date);      
     }
     const dateRef = useRef<(HTMLDivElement | null)[]>([]);
+
     const getdate =(index:number)=>{
         const element = dateRef.current[index];
         if(element){
@@ -248,11 +248,14 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
     }
 
     return(
-        <div style={{flex: 2,overflowY: 'auto',height:"calc(100vh - 66.5px)" }}>
+        <div style={{flex: 2,overflowY: 'auto',height:'100%'}}>
             <div style={{width:'100%'}}>
-                <div style={{fontSize:'35px',fontWeight:700,margin:'20PX'}}>{name}</div>
-                <div style={{fontSize:'20px',fontWeight:700,margin:'20PX'}}>{startdate} ~ {enddate}</div>
-                <div style={{display:'flex',marginTop:'20PX',width:'100%',justifyContent:'space-between',height:'50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'}}>
+              <div style={{position: 'relative',height:'120px', backgroundImage: `url('/background/${record.backgroundImage}')`,paddingTop:'20PX',paddingBottom:'20px',backgroundPosition: 'center ', backgroundSize: 'cover',}}>
+                <div style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)'}}></div>
+                <div style={{position: 'relative',fontSize:'30px',fontWeight:600,marginTop:'20PX',marginLeft:'20px',color:'#f3f3f3ff'}}>{name}</div>
+                <div style={{position: 'relative',fontSize:'20px',fontWeight:500,margin:'20PX',color:'#f3f3f3ff'}}>{startdate} ~ {enddate}</div>
+              </div>
+                <div style={{display:'flex',width:'100%',justifyContent:'space-between',height:'50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'}}>
                     <div style={{width:'40px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',fontSize:'30px',textAlign:'center',paddingTop:'5PX',color:'#ea9999ff'}} onClick={listLeft}>&lt;</div>
                     <div style={{ width: 'calc(100% - 80px)',display: 'flex',overflow: 'hidden'}} ref={myRef}>
                         {dateRange.map((date, index:number) => (
@@ -390,27 +393,30 @@ function Mymap({record,searchMarker,setTravelTimes}:Mymap){
     }, [searchMarker]);
     
         return(
-            <APIProvider apiKey={`${apiKey}`} >
-              <Map
-                  style={{flex: 3,height:"calc(100vh - 66.5px)" }}
-                  defaultCenter={record ? record.coordinates : { lat:  0, lng:  0 }}
-                  defaultZoom={13}
-                  gestureHandling={'greedy'}
-                  disableDefaultUI={true}
-                  mapId='842bf081f72c1734'
-                  center={center }
-                  zoom={zoom }
-                  key={searchMarker ? 'focused' : 'default'}
-              >
-                    <MapContent  
-                      dateRange={dateRange} 
-                      searchMarker={searchMarker} 
-                      setTravelTimes={setTravelTimes} 
-                      
-                    />
-              </Map>
-            </APIProvider>
-            )
+          <div style={{ height: '100%',flex:'3'}}>
+                <APIProvider apiKey={`${apiKey}`} >
+                    <Map
+                        style={{width: '100%', height: '100%' }}
+                        defaultCenter={record ? record.coordinates : { lat:  0, lng:  0 }}
+                        defaultZoom={13}
+                        gestureHandling={'greedy'}
+                        disableDefaultUI={true}
+                        mapId='842bf081f72c1734'
+                        center={center }
+                        zoom={zoom }
+                        key={searchMarker ? 'focused' : 'default'}
+                    >
+                          <MapContent  
+                            dateRange={dateRange} 
+                            searchMarker={searchMarker} 
+                            setTravelTimes={setTravelTimes} 
+                            
+                          />
+                    </Map>
+                </APIProvider>
+          </div>
+            
+        )
            
           
 }
@@ -465,7 +471,7 @@ function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:searchP
 
     return(
       <APIProvider apiKey={`${apiKey}`}>
-          <div style={{flex: 2,overflowY: 'auto',height:"calc(100vh - 66.5px)" }}>
+          <div style={{flex: 2,overflowY: 'auto',height:'100vh'}}>
             <div style={{margin:'40px auto',width:'90%'}}>
                 <div style={{marginBottom:'20px',color:'#999999ff',fontSize:'18px',fontWeight:'600'}} onClick={back}>←  回上頁</div>
 
@@ -715,6 +721,8 @@ async function  getCoordinates(address:string,countryCode:string) {
    // console.log(data.results[0].place_id);
     const placeId=data.results[0].place_id
     const location = data.results[0].geometry.location;
+    
+    
     return {
       coordinates:{
         lat: location.lat,

@@ -4,10 +4,12 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { useState,useEffect, use, } from "react";
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'
+import { useRouter,usePathname } from 'next/navigation'
 import { getAuth, onAuthStateChanged,signOut,signInWithPopup,GoogleAuthProvider } from "firebase/auth";
 import { auth } from "./firebase.js"
 const inter = Inter({ subsets: ["latin"] });
+import Image from 'next/image';
+
 
 /*
 export const metadata: Metadata = {
@@ -23,9 +25,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
-
-
+  const specialRoute =  /^\/[^\/]+\/trip\/[^\/]+$/.test(pathname);
+  const [name,setName]=useState<string|null>('')
+  const[userPhoto ,setUserPhoto]=useState<String|null>('')
+  const [showSignOut, setShowSignOut] = useState(false);
   function handleSignOut(){
     signOut(auth).then(() => {
       setUser(null)
@@ -34,11 +39,6 @@ export default function RootLayout({
       
     });
   }
-
-
-  
-
-
   function handleSignin(){
     
     const provider = new GoogleAuthProvider();
@@ -61,7 +61,10 @@ export default function RootLayout({
   useEffect(()=>{
     const  unsubscribe=onAuthStateChanged(auth,(currentUser)=>{
       if(currentUser){
-        
+        //console.log(currentUser.displayName);
+        //console.log(currentUser.photoURL);
+        setName(currentUser.displayName)
+        setUserPhoto(currentUser.photoURL)
         setUser(currentUser)
         
       }else{
@@ -73,19 +76,58 @@ export default function RootLayout({
   },[setUser])
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} >
         <div className="header">
-          
-          <div className="header_name" onClick={()=>{router.push('/trip');}}  >
+          <div 
+            className="header_name" 
+            onClick={()=>{router.push('/trip');}}   
+            style={{ marginLeft: specialRoute ? '20px' : '120px' }}
+            >
             Cheerliday
           </div>
-          <div className="header_member">
+
+          {/*
+          <div className="header_member" style={{ marginRight: specialRoute ? '20px' : '120px' }}>
             {user ? <div onClick={handleSignOut}>登出</div> : <div onClick={handleSignin}>登入</div>}
           </div>
+          */}
+          <div>
+            {
+              user?(
+                  <div style={{display:'flex',height:'50px',justifyContent:'center',width:'350px',alignItems: 'center'}}>
+              
+                  <div 
+                      style={{
+                        marginLeft:'10PX',
+                        height:'35px',
+                        width:'35px',
+                        borderRadius:'50%', 
+                        boxShadow: '0 0 0 2px white, 0 0 0 3px #666666ff',
+                        backgroundImage: `url(${userPhoto})`,
+                        backgroundPosition: 'center', 
+                        backgroundSize: 'cover',
+                        }}
+                    >    
+                  </div>
+                  <div  style={{marginLeft:'10px',fontSize:'20PX',fontWeight: '600',color:'#575757ff'}}>{name}，你好！</div>
+                  <div style={{display:'flex'}} onClick={handleSignOut}>
+                      <Image
+                        src="/logout.png"
+                        alt="登出"
+                        width={20}
+                        height={20}
+                        style={{marginLeft:'30PX',marginRight:'5px'}}
+                      />
+                      <div>登出</div>
+                  </div>
+                </div>
+              ):(<div className="header_member" onClick={handleSignin}>登入</div>)
+            }
+          </div>
         </div>
-        <hr style={{color:'black',margin:'0',padding:'0',border:'0',height:'1.5px', boxSizing: 'border-box',background: '#999999ff'}}></hr>
-        {children}
+        <main >{children}</main>
       </body>
     </html>
   );
 }
+

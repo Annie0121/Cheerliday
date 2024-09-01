@@ -1,3 +1,35 @@
+.pageContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.contentContainer {
+    display: flex;
+    height: calc(100vh - 65px);
+    margin-top: 65px;
+}
+
+/* 調整 Schedule 和 Mymap 組件的樣式 */
+.contentContainer > div:first-child {
+    flex: 2;
+    overflow-y: auto;
+}
+
+.contentContainer > div:last-child {
+    flex: 3;
+}
+
+.scheduleContainer {
+    height: 100%;
+    overflow-y: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+
+
 .container{
     width:100%;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 -4px 6px rgba(0, 0, 0, 0.1);
