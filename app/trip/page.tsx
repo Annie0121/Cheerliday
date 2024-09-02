@@ -125,12 +125,28 @@ function List({ShowPlan}:ListProps){
            
             <div style={{width:'1080px',margin:'20px auto',display:'flex',flexWrap:'wrap'}}>
                 {records.map((data,index)=>(
-                    <div key={data.id} onClick={() => planUrl(user.uid, data.id)} style={{width:'250px',height:'200px',margin: '10px',boxShadow: '0 6px 12px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15)',borderRadius:'10px'}}>
+                    <div key={data.id} onClick={() => planUrl(user.uid, data.id)} style={{width:'250px',height:'200px',margin: '10px',boxShadow: '0 6px 12px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15)',borderRadius:'10px',cursor:'pointer'}}>
+                        {/*
                         <div style={{height:'120px', display:'flex',justifyContent:'flex-end', backgroundImage: `url('/background/${records[index].backgroundImage}')`,backgroundSize: 'cover',borderTopLeftRadius: '10px', borderTopRightRadius: '10px',backgroundPosition: 'center '}}>
                             <div style={{backgroundColor:'white',height:'20px',width:'20px',fontSize:'16px',marginTop:'5PX',display: 'flex', alignItems: 'center', justifyContent: 'center',marginRight:'10px',borderRadius:'50%'}} 
                                  onClick={(e) => { e.stopPropagation(); handleDel(data.id); }}>×
                             </div>
                         </div>
+                            
+                         */}
+                        <div style={{height:'120px',display:'flex',justifyContent:'flex-end', position: 'relative'}}>
+                            <Image 
+                                src={`/background/${records[index].backgroundImage}`}
+                                alt="行程圖片"
+                                layout='fill'
+                                style={{objectFit:'cover',zIndex:'0',borderTopLeftRadius: '10px', borderTopRightRadius: '10px'}} 
+                                priority
+                                />
+                            <div style={{backgroundColor:'white',height:'20px',width:'20px',lineHeight:'20px', fontSize:'18px',marginTop:'5PX',display: 'flex', alignItems: 'center', justifyContent: 'center',marginRight:'10px',borderRadius:'50%',zIndex:1}} 
+                                 onClick={(e) => { e.stopPropagation(); handleDel(data.id); }}>×
+                            </div>
+                        </div>
+
                         <div style={{backgroundColor:'white',paddingTop:'5PX',paddingBottom:'5px',borderBottomLeftRadius: '10px', borderBottomRightRadius: '10px'}} >
                             <div style={{margin:'10px 10px',fontSize:'19px',fontWeight:'900',color:'#4d4d4dff'}}>{data.name}</div>
                             <div style={{margin:'10px 10px',fontSize:'14px',fontWeight:'400',color:'#767474ff'}}>{data.startdate} - {data.enddate}</div>

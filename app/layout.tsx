@@ -85,12 +85,6 @@ export default function RootLayout({
             >
             Cheerliday
           </div>
-
-          {/*
-          <div className="header_member" style={{ marginRight: specialRoute ? '20px' : '120px' }}>
-            {user ? <div onClick={handleSignOut}>登出</div> : <div onClick={handleSignin}>登入</div>}
-          </div>
-          */}
           <div>
             {
               user?(

@@ -352,10 +352,10 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
                             })  
                         )}
                         <div style={{margin:'30px 100px',width:'70px',height:'80px',display: 'grid', placeItems: 'center'}}>
-                            <div style={{width: '50px',height: '50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',borderRadius:' 50%',display: 'flex',alignItems: 'center',justifyContent: 'center',backgroundColor: 'white',cursor:'pointer',fontSize:'35px'}}
-                          onClick={() => addplace(date.date)}>
-                              +
-                          </div> 
+                            <div style={{width: '50px',height: '50px',lineHeight:'50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',borderRadius:' 50%',display: 'flex',alignItems: 'center',justifyContent: 'center',backgroundColor: 'white',cursor:'pointer',fontSize:'35px'}}
+                                 onClick={() => addplace(date.date)}>
+                                    ＋
+                            </div> 
                           <div style={{marginTop:'10PX',fontWeight:'600',color:'#666666ff'}}>加入景點</div>
                         </div>
                     </React.Fragment>)
@@ -471,7 +471,7 @@ function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:searchP
 
     return(
       <APIProvider apiKey={`${apiKey}`}>
-          <div style={{flex: 2,overflowY: 'auto',height:'100vh'}}>
+          <div style={{flex: 2,overflowY: 'auto',height:'100%'}}>
             <div style={{margin:'40px auto',width:'90%'}}>
                 <div style={{marginBottom:'20px',color:'#999999ff',fontSize:'18px',fontWeight:'600'}} onClick={back}>←  回上頁</div>
 
