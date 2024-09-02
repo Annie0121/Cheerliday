@@ -60,7 +60,7 @@ function List({ShowPlan}:ListProps){
     const[isLoaded,setIsLoaded]=useState(false)
     const [records, setRecords] = useState<any[]>([]);
     console.log(records);
-    
+    const router = useRouter();
     const fetchUserData = async(userId: string) => {
         const q = query(collection(db, "record"), where("userid", "==", userId))
         try {
@@ -78,7 +78,7 @@ function List({ShowPlan}:ListProps){
         }   
     }
     
-    const router = useRouter();
+    
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
@@ -101,7 +101,7 @@ function List({ShowPlan}:ListProps){
     
     
     const planUrl= (userid: string, recordid: string)=>{
-        window.location.href = `/${userid}/trip/${recordid}`;
+        
         router.push(`/${userid}/trip/${recordid}`)
 
     }
@@ -126,14 +126,7 @@ function List({ShowPlan}:ListProps){
             <div style={{width:'1080px',margin:'20px auto',display:'flex',flexWrap:'wrap'}}>
                 {records.map((data,index)=>(
                     <div key={data.id} onClick={() => planUrl(user.uid, data.id)} style={{width:'250px',height:'200px',margin: '10px',boxShadow: '0 6px 12px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15)',borderRadius:'10px',cursor:'pointer'}}>
-                        {/*
-                        <div style={{height:'120px', display:'flex',justifyContent:'flex-end', backgroundImage: `url('/background/${records[index].backgroundImage}')`,backgroundSize: 'cover',borderTopLeftRadius: '10px', borderTopRightRadius: '10px',backgroundPosition: 'center '}}>
-                            <div style={{backgroundColor:'white',height:'20px',width:'20px',fontSize:'16px',marginTop:'5PX',display: 'flex', alignItems: 'center', justifyContent: 'center',marginRight:'10px',borderRadius:'50%'}} 
-                                 onClick={(e) => { e.stopPropagation(); handleDel(data.id); }}>×
-                            </div>
-                        </div>
-                            
-                         */}
+                      
                         <div style={{height:'120px',display:'flex',justifyContent:'flex-end', position: 'relative'}}>
                             <Image 
                                 src={`/background/${records[index].backgroundImage}`}
@@ -167,7 +160,7 @@ interface PlanProps {
 }
 
 function Plan({onClose, recordCount}:PlanProps){
-    
+    const router = useRouter();
     const[name,setName]=useState("")
     const[city,setCity]=useState('')
     const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
@@ -231,7 +224,7 @@ function Plan({onClose, recordCount}:PlanProps){
           });
           
           const recordid =docRef.id
-          window.location.href = `/${userid}/trip/${recordid}`;
+          router.push(`/${userid}/trip/${recordid}`)
           
         }catch(error) {
           console.error(error);
@@ -272,8 +265,8 @@ function Plan({onClose, recordCount}:PlanProps){
                     
                 </div>
                 <div style={{marginTop:'40px',width:'307px',textAlign:'end'}}>
-                    <button style={{all: 'unset',color:'#666666',marginRight:'25px',fontSize:'17px'}} onClick={onClose}>取消</button>
-                    <button onClick={getPlan} style={{fontSize:'17px',backgroundColor:'#ea9999ff',border:'0px',color:'white',borderRadius:'2px'}}>完成</button>
+                    <button style={{all: 'unset',color:'#666666',marginRight:'25px',fontSize:'17px',cursor:'pointer'}} onClick={onClose}>取消</button>
+                    <button onClick={getPlan} style={{fontSize:'17px',backgroundColor:'#ea9999ff',border:'0px',color:'white',borderRadius:'2px',cursor:'pointer'}}>完成</button>
                 </div>
             </div>
         </div>
