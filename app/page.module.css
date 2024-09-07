@@ -1,3 +1,24 @@
+.container{
+   position: relative;
+   height: 100vh;
+}
+
+.container_image{
+  width:100%;
+  height:calc(100vh - 65px);
+  object-position: 50% 65%;
+  object-fit: cover;
+  vertical-align:middle;
+  margin-top:65px;
+}
+
+.container_text{
+  position: absolute;
+  top: 50%;
+  left: 50%; 
+  transform: translate(-50%, -50%);
+}
+
 @keyframes moveUpDown {
     0%, 100% {
       transform: translateY(0);
@@ -9,5 +30,35 @@
   
   .animatedText {
     animation: moveUpDown 2s infinite;
+    font-size:30PX;
+    font-weight:700;
+    color:#E4E4E4;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   }
   
+
+@media(max-width:1000px){
+  .animatedText {
+    font-size: 28px; 
+    text-align: center; 
+  }
+  .container_image{
+    height:calc(100vh - 60px);
+    margin-top:60px;
+  }
+  
+
+
+
+}
+
+@media (max-width:600px) {
+  .animatedText {
+    font-size: 25px; 
+    text-align: center; 
+  }
+  .container_image{
+    height:calc(100vh - 50px);
+    margin-top:50px;
+  }
+}

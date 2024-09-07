@@ -13,24 +13,36 @@ import openImg from './open.png'
 import webImg from './web.png'
 import phoneImg from './phone.png'
 import { Select, Button, Modal } from 'antd';
-
-
+import{ DurationComponent  } from './components/DurationComponent';
+import {TimeComponent} from './components/TimeComponent'
+import{MapContent} from './components/MapContent'
+import{getCoordinates} from './utils/getCoordinates'
+import{getDurationTime}from './utils/getDurationTime'
+import { SearchPlace} from './components/SearchPlace'
+import { Mymap}from "./components/Mymap"
+import{ Schedule} from "./components/Schedule"
 const { Option } = Select;
 import dayjs from 'dayjs';
+import mapimg from "./map.png"
+import { useUser } from '@/app/UserContext';
 
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 const colors=['#d05b6eff ',"#45818eff","#c1683cff","#a64d79ff","#a28c37ff","#8075b5ff","#6aa84fff"]
 export default function Home(){
-    const [user, setUser] = useState<any>(null);
+    //const [user, setUser] = useState<any>(null);
     const [record, setRecord] = useState<any>(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [selectedDay, setSelectedDay] = useState("");
     const [searchMarker, setSearchMarker] = useState<{ lat: number; lng: number } | null>(null);
     const [travelTimes, setTravelTimes] = useState({});
+    const [isMobile, setIsMobile] = useState(false)
+    const [activeView, setActiveView] = useState(false);
     const router=useRouter()
+    const { user, loading } = useUser();
     
 
     //確認用戶登入狀態
+    /*
     useEffect(()=>{
         const  unsubscribe=onAuthStateChanged(auth,(currentUser)=>{
           if(currentUser){
@@ -48,9 +60,29 @@ export default function Home(){
           }
         })
         return () => unsubscribe();
-    },[setUser,router])
+    },[setUser,router])*/
+    useEffect(()=>{
+      if(user){
+        const url=window.location.href.split("/")
+        let recordId=url[5];
+        if(!loading){
+          fetchUserData(user.uid,recordId);
+        }
+      }
+    },[user,router])
+    /*
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setIsLoaded(true);
+      }, 10000); // 3000毫秒 = 3秒
+    
+      return () => clearTimeout(timer);
+    }, []);*/
 
-   
+    useEffect(() => {
+      setIsMobile(window.innerWidth <= 1000);
+    }, []);
+
     //抓取用戶資料，渲染行程總攬
     const fetchUserData = async(userId: string,recordid:string) => {
         const q = query(collection(db, "record"), where("userid", "==", userId), where("__name__", "==", recordid));
@@ -68,27 +100,86 @@ export default function Home(){
         }   
     }
     if (!isLoaded) {
-        return <div>Loading...</div>;
+        return <Loading></Loading>;
     }
+    
+   
 
     return(
-      <div style={{display:'flex',flexDirection:'column',height:'100vh',overflowY:'hidden'}}>
-        <div style={{display:'flex',height:' calc(100vh - 65px)',marginTop:'65px'}}>
-          
-              {selectedDay?
-              (< SearchPlace record={record} setSelectedDay={setSelectedDay} selectedDay={selectedDay} setSearchMarker={setSearchMarker}></SearchPlace>)
-              :<Schedule setSelectedDay={setSelectedDay} record={record} travelTimes={travelTimes} setRecord={setRecord}></Schedule>}
-              <Mymap record={record} searchMarker={searchMarker} setTravelTimes={setTravelTimes}></Mymap> 
-          
+      
+      <div className={styles.container} >
+        {
+          !isLoaded && (
+            <Loading></Loading>
+          )
+        }
+        
+
+        <div className={styles.content_container}>
+              <div className={`${styles.schedule} ${isMobile && activeView  ? styles.hidden:"" } `}>
+                  {selectedDay?
+                    (< SearchPlace 
+                        record={record} 
+                        setSelectedDay={setSelectedDay} 
+                        selectedDay={selectedDay} 
+                        setSearchMarker={setSearchMarker}
+                        
+                      ></SearchPlace>)
+
+                    :<Schedule 
+                        setSelectedDay={setSelectedDay} 
+                        record={record} 
+                        travelTimes={travelTimes} 
+                        setRecord={setRecord}
+                        
+                      ></Schedule>}
+              </div>
+                
+
+              <div className={`${styles.map} ${isMobile && !activeView  ? styles.hidden:"" } `} >
+                <Mymap 
+                    record={record} 
+                    searchMarker={searchMarker} 
+                    setTravelTimes={setTravelTimes}
+                    
+                ></Mymap> 
+              </div>
         </div>
-          
-      </div>
-        
+        <footer className={styles.footer} >
+          <div style={{textAlign: 'center',height:'50px',width:'80px',marginRight:'10px'}}>
+            <Image style={{marginTop:'5PX'}} src={mapimg} height={30} width={30} alt='地圖'  onClick={()=>{setActiveView(!activeView)}}></Image>
+            {activeView==true?(
+              <div style={{fontSize:'13px', color:'#666666ff', fontWeight:'600'}}>顯示行程</div>
+            ):(<div style={{fontSize:'13px', color:'#666666ff',fontWeight:'600'}}>顯示地圖</div>)}
             
-        
+          </div>
+          
+        </footer>
+      </div>
+ 
     )
 }
 
+const Loading =()=>{
+return(
+            <div style={{height:'100%',width:'100%',backgroundColor:'#000000ad',zIndex:1000, position: 'fixed',color:'white'}} >
+              <div className={styles.loading} >
+                  <span>L</span>
+                  <span>O</span>
+                  <span>A</span>
+                  <span>D</span>
+                  <span>I</span>
+                  <span>N</span>
+                  <span>G</span>
+                  <span>.</span>
+                  <span>.</span>
+                  <span>.</span>
+              </div>
+          </div>
+)
+}
+
+/*
 interface Coordinates {
   lat: number;
   lng: number;
@@ -106,6 +197,9 @@ interface Record {
   backgroundImage:string
 }
 
+
+
+
 interface Schedule{
   record:Record,
   setSelectedDay:React.Dispatch<React.SetStateAction<string>>,
@@ -120,12 +214,17 @@ interface Attraction {
   picture:string,
   stayDuration: number
 }
+
+
+
 interface DateRangeItem {
   date: string;
   startTime:string;
   attractions: Attraction[];
 }
+*/
 
+/*
 function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
     const [name, setname] = useState(record ? record.name : "");
     const[startdate,setstartdate]=useState(record ? record.startdate : "");
@@ -188,29 +287,30 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
           if (Object.keys(travelTimes).length === 0) {
             return [];
           }
-        let currentTime = date.startTime;
-        const times :{ startTime: string, endTime: string }[] = [];
-        let currentDate=date.date
-        date.attractions.forEach((attraction:Attraction, index:number) => {
-                let startTime = currentTime; 
-                let endTime = addMinutes(startTime, attraction.stayDuration);
-                if (index < date.attractions.length - 1) {
-                  if(travelTimes[currentDate] && travelTimes[currentDate][index]){
-                      let drivetime = parseInt(travelTimes[currentDate][index].split(" ")[0]);
-                      currentTime = addMinutes(endTime, drivetime); 
-                  }
-                    
-                }
-                times.push({ startTime, endTime }); 
-              
-            });
-        return(times);
+            let currentTime = date.startTime;
+            const times :{ startTime: string, endTime: string }[] = [];
+            let currentDate=date.date
+            date.attractions.forEach((attraction:Attraction, index:number) => {
+                    let startTime = currentTime; 
+                    let endTime = getDurationTime(startTime, attraction.stayDuration);
+                    if (index < date.attractions.length - 1) {
+                      if(travelTimes[currentDate] && travelTimes[currentDate][index]){
+                          let drivetime = parseInt(travelTimes[currentDate][index].split(" ")[0]);
+                          currentTime = getDurationTime(endTime, drivetime); 
+                      }
+                        
+                    }
+                    times.push({ startTime, endTime }); 
+                  
+                });
+            return(times);
         
-      };
+        };
    
     function addplace(date:string){
         setSelectedDay(date);      
     }
+
     const dateRef = useRef<(HTMLDivElement | null)[]>([]);
 
     const getdate =(index:number)=>{
@@ -364,6 +464,10 @@ function Schedule({record,setSelectedDay,travelTimes,setRecord}:Schedule){
         </div>
     )
 }
+
+*/
+
+/*
 interface Mymap{
   record:Record;
   searchMarker:Coordinates| null;
@@ -420,6 +524,12 @@ function Mymap({record,searchMarker,setTravelTimes}:Mymap){
            
           
 }
+
+*/
+
+
+/*
+
 interface searchPlace{
   record:Record;
   setSelectedDay:React.Dispatch<React.SetStateAction<string>>;
@@ -430,14 +540,13 @@ interface searchPlace{
 } | null>>
 }
 
+
+
 function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
     const[place,setPlace]=useState('')
     const [placeCoordinates, setPlaceCoordinates] = useState<{ lat: number | null, lng: number | null }>({ lat: null, lng: null });
     const [countryCode,setCountryCode]= useState(record?record.countryCode:'')
     const[placeId,setPlaceId]=useState('')
-  
-
-
     const handleSearchPlace =async () => {
       try {
         const placeinfo = await getCoordinates(place,countryCode);
@@ -514,6 +623,11 @@ function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:searchP
         
     )
 }
+
+*/
+
+
+/*
 interface placeinformation{
   placeId:string,
   setPlaceCoordinates:React.Dispatch<React.SetStateAction<{
@@ -534,20 +648,14 @@ interface placeinformation{
 function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates,setSearchMarker, selectedDay, setSelectedDay}: placeinformation){
   const [placeDetails, setPlaceDetails] =  useState<google.maps.places.PlaceResult | null>(null);
   const [photoUrl, setPhotoUrl] = useState('');
-  //const map = useMap();
-  console.log(selectedDay);
-  
   const placesLib = useMapsLibrary('places');
-  console.log(placeId);
-  //const service = new google.maps.places.PlacesService(document.createElement('div'));
+
   useEffect(() => {
-    
-    console.log("placesLib:", placesLib);
+   
     if (!placesLib ) {
-      console.log("Maps library or map is not available yet");
+      console.log(" not available yet");
       return;
     }
-    console.log("有資料");
 
     const service = new placesLib.PlacesService(document.createElement('div'));
     const request = {
@@ -560,7 +668,6 @@ function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates,setSea
 
     service.getDetails(request, (place, status) => {
       if (status === placesLib.PlacesServiceStatus.OK) {
-        console.log(place);
         
         if(place){
           setPlaceDetails(place)
@@ -578,14 +685,9 @@ function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates,setSea
   }, [placeId,  placesLib]);
 
   const handleAddPlace = async() =>{
-     /* if (placeCoordinates.lat === null || placeCoordinates.lng === null) {
-      alert("查無景點");
-      return;
-    }*/
 
       if (!placeDetails || !placeDetails.name || !placeDetails.formatted_address || !placeCoordinates.lat || !placeCoordinates.lng || !photoUrl) {
-       
-        return; // 停止執行，如果有資料為空
+        return; 
       }
       const newPlace: Attraction = {
         name:placeDetails.name,
@@ -621,8 +723,6 @@ function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates,setSea
               });
               await updateDoc(docRef, { dateRange });
           }
-          
-         
   
           // 清空選擇的景點與日期
           
@@ -706,9 +806,13 @@ function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates,setSea
     
   )
 }
+*/
 
 
 
+
+
+/*
 async function  getCoordinates(address:string,countryCode:string) {
   console.log(countryCode);
   
@@ -732,7 +836,11 @@ async function  getCoordinates(address:string,countryCode:string) {
       
     };
   }
+*/
 
+
+
+/*
 interface mapcontent{
   dateRange: DateRangeItem[];
   searchMarker:Coordinates| null;
@@ -741,6 +849,8 @@ interface mapcontent{
 
 
 //景點路徑
+
+
 function MapContent({ dateRange,searchMarker,setTravelTimes }:mapcontent) {
   const map = useMap();
   const maps = useMapsLibrary("maps") ;
@@ -797,7 +907,10 @@ function MapContent({ dateRange,searchMarker,setTravelTimes }:mapcontent) {
     </>
   );
 }
-  
+ */ 
+
+
+/*
 interface calculateTravelTimes{
   dateRange: DateRangeItem[];
   setTravelTimes:React.Dispatch<React.SetStateAction<{}>>
@@ -850,12 +963,15 @@ function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes
         }
         setTravelTimes(newTravelTimes)
       };
-  
-      // 立即執行異步函式
       calculateDistances();
     }, [routes, dateRange]);
   }
-  
+*/
+
+
+
+
+ /* 
   interface timecomponent{
     setshowModal:React.Dispatch<React.SetStateAction<boolean>>,
     dateRange:DateRangeItem[],
@@ -865,7 +981,8 @@ function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes
 
 
 
-  /* 出發時間輸入框*/
+   出發時間輸入框
+
  const TimeComponent = ({setshowModal,dateRange,setDateRange,currentDateIndex}:timecomponent) => {
   const [period, setPeriod] = useState('AM');
   const [hour, setHour] = useState(8);
@@ -935,7 +1052,9 @@ function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes
     
   );
   };
+*/
 
+/*
   interface durationcomponent{
     AttractionIndex:number,
     setAttractionIndex:React.Dispatch<React.SetStateAction<number | null>>,
@@ -998,12 +1117,15 @@ function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTravelTimes
   )
  }
 
+*/
+
 
  //計算景點時間
- const addMinutes = (time:string, minutes:number) => {
+ /*
+ const getDurationTime = (time:string, minutes:number) => {
   const [hours, mins] = time.split(':').map(Number);
   const totalMinutes = hours * 60 + mins + minutes;
   const newHours = Math.floor(totalMinutes / 60) % 24;
   const newMins = totalMinutes % 60;
   return `${String(newHours).padStart(2, '0')}:${String(newMins).padStart(2, '0')}`;
-};
+};*/

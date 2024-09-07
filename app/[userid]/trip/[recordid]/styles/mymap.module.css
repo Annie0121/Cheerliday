@@ -1,0 +1,13 @@
+.mymap{
+    height: 100%;
+    flex:3;
+}
+
+@media (max-width:1000px) {
+    .mymap{
+        order: 1;
+        display: none;
+        height: calc(100%-60px);
+        flex: none;
+    }
+}
