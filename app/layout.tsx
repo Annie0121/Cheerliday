@@ -110,18 +110,3 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
 
 
-function Signin(){
-  return(
-    <div style={{width:'100%',height:'100%',position:'fixed',zIndex:1000,left:0,top:0}}>
-        <div style={{height:'400px',width:'390px',backgroundColor:'#ffffffdd',zIndex:8, margin: '145px auto',borderRadius:'10px', display: 'flex', justifyContent: 'center', alignItems: 'center',backdropFilter: 'blur(5px)'}}>
-          <div style={{width:'80%',height:'70%'}}>
-            <input style={{borderRadius:'8px',height:'40px',width:'100%',border: 'none', outline: 'none', boxSizing: 'border-box'}} placeholder="請輸入電子信箱"></input>
-            <input style={{borderRadius:'8px',height:'40px',width:'100%',marginTop:'20px',border: 'none', outline: 'none', boxSizing: 'border-box'}} placeholder="請輸入密碼"></input>
-            <div style={{borderRadius:'8px',height:'40px',width:'100%',marginTop:'20px',backgroundColor:'#ea9999ff'}}>登入</div>
-
-          </div>
-          
-        </div>
-    </div>
-  )
-}
