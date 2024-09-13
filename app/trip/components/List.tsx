@@ -63,8 +63,8 @@ export default function List({ShowPlan}:ListProps){
         <>
             <div className={styles.button_container} >
                 <button className={styles.button} 
-                        onClick={() => ShowPlan(records.length)}
-                >+ 新增行程</button>     
+                        onClick={() => ShowPlan(records.length)} //點擊時，獲取當前數據長度
+                >新增行程</button>     
             </div>
            
             <div className={styles.list_container} >

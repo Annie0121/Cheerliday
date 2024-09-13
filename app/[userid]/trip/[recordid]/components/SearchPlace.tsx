@@ -1,7 +1,6 @@
-import React, { useEffect, useState ,useRef} from 'react';
+import React, {  useState } from 'react';
 import{getCoordinates} from '../utils/getCoordinates'
 import {APIProvider } from '@vis.gl/react-google-maps';
-import styles from '../recordid.module.css';
 import Image from 'next/image';
 import { Placeinformation} from '../components/Placeinformation'
 import searchImg from '../search.png'
@@ -57,13 +56,14 @@ export function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:
     const [countryCode,setCountryCode]= useState(record?record.countryCode:'')
     const[placeId,setPlaceId]=useState('')
     const[error,seterror]=useState('')
+
+    //獲取景點座標及PlaceId
     const handleSearchPlace =async () => {
       try {
         const placeinfo = await getCoordinates(place,countryCode);
         const coordinates=placeinfo.coordinates
         const placeId= placeinfo.placeId
         setPlaceId(placeId)
-       
         setPlaceCoordinates(coordinates);
         setSearchMarker(coordinates);
         seterror("")
@@ -75,6 +75,7 @@ export function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:
          
     };
 
+    //回上一頁
     function back(){
         setPlace("");
         setPlaceCoordinates({ lat: null, lng: null });
@@ -86,8 +87,8 @@ export function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:
     return(
       <APIProvider apiKey={`${apiKey}`}>
           <div className={style.searchplace}>
-            <div style={{margin:'40px auto',width:'90%'}}>
-                <div style={{marginBottom:'20px',color:'#999999ff',fontSize:'18px',fontWeight:'600',cursor:'pointer'}} onClick={back}>←  回上頁</div>
+            <div style={{margin:'40px auto',width:'90%'}} >
+                <div className={style.searchplace_back}  onClick={back}>←  回上頁</div>
 
                 <div style={{display:'flex',margin:'0 auto'}}>
                     <input 
@@ -95,31 +96,26 @@ export function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:
                       placeholder="輸入景點"  
                       onChange={(e)=>{setPlace(e.target.value)}}
                       value={place}
-                      className={styles.search_input}
+                      className={style.search_input}
                     />
-                    <div style={{
-                          width:'15%',
-                          height:'45px',
-                          border: '2px solid #ea9999ff',
-                          borderRadius:'5px',
-                          borderTopRightRadius: '5px',
-                          borderBottomRightRadius: '5px',
-                          borderTopLeftRadius: '0',
-                          borderBottomLeftRadius: '0',
-                          display:'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          backgroundColor:'#ea9999ff',
-                          cursor:'pointer'
-                        }}
-                        onClick={()=>{setPlace(''),handleSearchPlace(),setPlaceId('')}}>
-                        <Image  width={22} height={22} src={searchImg} alt="search" />
+                    <div className={style.search_input_button}
+                         onClick={()=>{setPlace(''),handleSearchPlace(),setPlaceId('')}}>
+
+                         <Image  width={22} height={22} src={searchImg} alt="search" />
                     </div>
                 </div>
-                {error&&(<div style={{width:'85%',color:'red',marginLeft:'10PX',marginTop:'10px',fontWeight:'600'}}>{error}</div>)}
+                {error&&(<div className={style.error} >{error}</div>)}
                 
                 {placeId && (
-                  <Placeinformation placeId={placeId} selectedDay={selectedDay} placeCoordinates={placeCoordinates} setPlaceCoordinates={setPlaceCoordinates}  setSearchMarker={ setSearchMarker} setSelectedDay={setSelectedDay} ></Placeinformation>
+                  <Placeinformation 
+                      placeId={placeId} 
+                      selectedDay={selectedDay} 
+                      placeCoordinates={placeCoordinates} 
+                      setPlaceCoordinates={setPlaceCoordinates}  
+                      setSearchMarker={ setSearchMarker} 
+                      setSelectedDay={setSelectedDay} 
+                    />
+                 
                  )}
             </div>
                  

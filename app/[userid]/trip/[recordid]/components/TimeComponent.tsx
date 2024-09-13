@@ -74,7 +74,7 @@ export const TimeComponent = ({setshowModal,dateRange,setDateRange,currentDateIn
     return (
       <div className={styles.dialog_background}>
           <div className={styles.dialog}>
-            <div style={{marginBottom:'30PX'}}>出發時間：</div>
+            <div style={{marginBottom:'30PX',fontSize:'18px',fontWeight:'600',letterSpacing:'2px',color:'#6fb6e1ff'}}>出發時間：</div>
   
             <Select value={period} onChange={(value)=>{setPeriod(value)}} style={{ width: 80, marginRight: 8 }}>
               <Option value="AM">AM</Option>
@@ -95,7 +95,7 @@ export const TimeComponent = ({setshowModal,dateRange,setDateRange,currentDateIn
   
             <div style={{marginTop:'40px',width:'250px',textAlign:'end'}}>
                       <button onClick={()=>{setshowModal(false)}} style={{ all: 'unset',color:'#666666',marginRight:'25px',fontSize:'17px',cursor:'pointer',}} >取消</button>
-                      <button  onClick={ handleSubmit} style={{width:'50px',height:'30px',fontWeight:'500',fontSize:'17px',backgroundColor:'#ea9999ff',border:'0px',color:'white',borderRadius:'4px',cursor:'pointer'}}>完成</button>
+                      <button  onClick={ handleSubmit} style={{width:'50px',height:'30px',fontWeight:'500',fontSize:'17px',backgroundColor:'#ff4757',border:'0px',color:'white',borderRadius:'4px',cursor:'pointer'}}>完成</button>
             </div>
           </div>
       </div>

@@ -1,0 +1,72 @@
+.signin_email{
+    border-radius:8px;
+    height:40px;
+    width:100%;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    padding:0 10px ;
+}
+
+.signin_password{
+    border-radius:8px;
+    height:40px;
+    width:100%;
+    margin-top:20px;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    padding:0 10px ;
+    
+}
+
+.signin_button{
+    border-radius:8px;
+    height:40px;
+    width:100%;
+    margin-top:20px;
+    background-color:#ff4757;
+    color:white;
+    font-size:20px;
+    text-align:center;
+    font-weight:550;
+    line-height:40px;
+    letter-spacing:5px;
+    cursor:pointer
+}
+
+.signup_email{
+    border-radius:8px;
+    height:40px;
+    width:100%;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    padding: 0 10px;
+}
+
+.signup_password{
+    border-radius:8px;
+    height:40px;
+    width:100%;
+    margin-top:20px;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    padding: 0 10px;
+}
+
+.signup_button{
+    border-radius:8px;
+    height:40px;
+    width:100%;
+    margin-top:20px;
+    background-color:#ff4757;
+    color:white;
+    font-size:20px;
+    text-align:center;
+    font-weight:550;
+    line-height:40px;
+    letter-spacing:5px;
+    cursor:pointer
+}

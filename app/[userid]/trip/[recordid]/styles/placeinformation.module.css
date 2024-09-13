@@ -1,0 +1,61 @@
+.container{
+    width:100%;
+    min-height:400px;
+    margin-top:30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.container_name{
+    font-size:25px;
+    font-weight:700;
+    padding:10px;
+    color:#434343ff
+}
+
+.container_address{
+    font-size:15px;
+    padding-left:10px;
+    color:#999999ff
+}
+
+.container_img{
+    width:100%;
+    height:330px;
+    overflow:hidden;
+    padding-top:20px
+}
+
+.placeDetails_openinghours{
+    display:flex;
+    align-items:flex-start;
+    padding-left: 10px;
+    padding-top: 10px
+}
+
+
+.placeDetails_openinghours_week{
+    margin-right: 15px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #999999ff
+}
+
+.placeDetails_website{
+    color:#ea9999ff;
+    font-size:16px;
+    word-break: break-all;
+    max-width: 90%;
+    white-space: normal
+}
+
+
+.container_button{
+    font-weight: 600;
+    font-size:17px;
+    background-color: #ff4757;
+    border: 0px;
+    color: white;
+    border-radius: 3px;
+    height: 35px;
+    cursor: pointer
+}

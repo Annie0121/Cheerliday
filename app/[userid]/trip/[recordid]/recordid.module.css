@@ -27,29 +27,6 @@
 
 
 
-.search_input{
-    width:85%;
-    height:45px;
-    border: 2px solid #ea9999ff; 
-    border-radius:5px;
-    border-top-left-radius: 5px; 
-    border-bottom-left-radius: 5px;
-    border-top-right-radius: 0; 
-    border-bottom-right-radius: 0;
-    outline: 'none' ;
-    padding:0 10px;
-    font-size: 16px;
-    
-}
-.search_input:focus {
-    border: 2px solid #ea9999ff; 
-    outline: none; 
-}
-.search_input::placeholder{
-    color: #999999ff;
-    font-size: 16px;
-    font-weight: 600;
-}
 
 .date_bar{
     width: 100px;

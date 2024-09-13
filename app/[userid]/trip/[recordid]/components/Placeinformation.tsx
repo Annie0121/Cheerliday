@@ -3,11 +3,8 @@ import React, { useEffect, useState ,useRef} from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import { doc, updateDoc,getDoc } from "firebase/firestore"; 
 import { db, auth } from '@/app/firebase';
-
-import openImg from '../open.png'
-import webImg from '../web.png'
-import phoneImg from '../phone.png'
 import Image from 'next/image';
+import style from "../styles/placeinformation.module.css"
 
 
 interface Coordinates {
@@ -56,7 +53,6 @@ export function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates
     useEffect(() => {
      
       if (!placesLib ) {
-        console.log(" not available yet");
         return;
       }
   
@@ -68,27 +64,30 @@ export function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates
           'opening_hours', 'website', 'rating', 
         ]
       };
-  
-      service.getDetails(request, (place, status) => {
-        if (status === placesLib.PlacesServiceStatus.OK) {
+     
+
+      service.getDetails(request,(place,status)=>{
+
+        if(status !== placesLib.PlacesServiceStatus.OK||!place){
+          console.error("not found");
+          return
           
-          if(place){
-            setPlaceDetails(place)
-            const photos = place.photos;
+        }else{
+          setPlaceDetails(place)
+          const photos = place.photos;
             if (photos && photos.length > 0) {
               const photoUrl = photos[0].getUrl({ maxWidth: 400, maxHeight: 400 });
               setPhotoUrl(photoUrl);
               console.log(photoUrl);
             }
-          }
-        } else {
-          console.error('Details not found');
         }
-      });
+      })
+
+
     }, [placeId,  placesLib]);
+
   
     const handleAddPlace = async() =>{
-  
         if (!placeDetails || !placeDetails.name || !placeDetails.formatted_address || !placeCoordinates.lat || !placeCoordinates.lng || !photoUrl) {
           return; 
         }
@@ -114,6 +113,8 @@ export function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates
             const recordid = url[5];
             const docRef = doc(db, 'record', recordid); 
             const docSnap = await getDoc(docRef);//獲取數據
+
+            //存數據 
             if(docSnap.exists()){
                 const dateRange: DateRangeItem[]  =docSnap.data().dateRange;
                 console.log(dateRange);
@@ -128,13 +129,13 @@ export function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates
             }
     
             // 清空選擇的景點與日期
-            
             setPlaceCoordinates({ lat: null, lng: null });
             setSelectedDay("");
             setSearchMarker(null)
             
-        } catch (error) {
-            console.error("更新資料失敗：", error);
+        } 
+        catch (error) {
+            console.error( error);
         }
     }
   
@@ -144,25 +145,26 @@ export function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates
     return(
       <div>
         {placeDetails?(
-          <div style={{width:'100%',minHeight:'400px',marginTop:'30px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'}}>
-              <div style={{fontSize:'25px',fontWeight:700,padding:'10px', color:'#434343ff'}}>{placeDetails.name}</div>
-              <div style={{fontSize:'15px',paddingLeft:'10PX',color:'#999999ff'}}>{placeDetails.formatted_address}</div>
+          <div className={style.container} >
+              <div className={style.container_name} >{placeDetails.name}</div>
+              <div className={style.container_address} >{placeDetails.formatted_address}</div>
               <div>
-                <img style={{width:'100%',height:'330px',overflow:'hidden',paddingTop:'20PX'}} src={photoUrl}></img>
+                <img className={style.container_img} 
+                     src={photoUrl}/>
               </div>
   
   
-              {
-                placeDetails.opening_hours&&(
-                  <div style={{ display: 'flex', alignItems: 'flex-start', paddingLeft: '10px', paddingTop: '10px' }}>
-                      <Image width={20} height={20} src={openImg} alt="open" style={{marginTop: '5px'}} />
+              { //營業時間
+                placeDetails.opening_hours &&(
+                  <div className={style.placeDetails_openinghours} >
+                      <Image width={20} height={20}  src="/open.png" alt="open" style={{marginTop: '5px'}} />
                       <div style={{ whiteSpace: 'pre-line', paddingLeft: '10px' }}>
                           {
                               placeDetails.opening_hours.weekday_text?.map((text, index)=>{
                                 const [day, time] = text.split(': ');
                                 return(
-                                  <div style={{ fontSize: '15px', marginTop: '5px' }} key={index}>
-                                    <span style={{ marginRight: '15px', fontSize: '16px', fontWeight: 700, color: '#999999ff' }}>{day}</span>
+                                  <div  style={{ fontSize: '15px', marginTop: '5px' }} key={index}>
+                                    <span className={style.placeDetails_openinghours_week} >{day}</span>
                                     <span style={{ color: '#666666ff' }}>{time}</span>
                                   </div>
                                 )
@@ -173,31 +175,37 @@ export function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates
                 )
               }
   
-              {
+              {  //店家電話
                   placeDetails.formatted_phone_number &&(
                     <div style={{paddingTop:'20px',paddingLeft:'10px',display:'flex'}}>
-                      <Image width={20} height={20} src={phoneImg} alt="phone"  style={{marginRight:'10px'}} />
+                      <Image width={20} height={20} src="/phone.png" alt="phone"  style={{marginRight:'10px'}} />
                       <span style={{color:'#666666ff'}}>{placeDetails.formatted_phone_number}</span>
                     </div>
                   )
                 }
   
               
-              {
+              { //店家網址
                 placeDetails.website &&(
                 <div style={{paddingTop:'20px',paddingLeft:'10px'}}>
-                  <div style={{display:'flex',alignItems:'center'}}> 
-                    <Image width={20} height={20} src={webImg} alt="web" style={{marginRight:'10px'}} />
-                    <a href={placeDetails.website} target="_blank" rel="noopener noreferrer" style={{color:'#ea9999ff',fontSize:'16px',wordBreak: 'break-all', maxWidth: '90%',whiteSpace: 'normal'}}>{placeDetails.website}</a>
-                  </div>
+                    <div style={{display:'flex',alignItems:'center'}}> 
+                        <Image width={20} height={20} src="/web.png" alt="web" style={{marginRight:'10px'}} />
+                        <a href={placeDetails.website} 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           className={style.placeDetails_website} >{placeDetails.website}
+                        </a>
+                    </div>
                 </div>
                 )
               }
-               <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '20px' }}>
-                  <button onClick={handleAddPlace} style={{ fontWeight: '600', fontSize: '17px', backgroundColor: '#ea9999ff', border: '0px', color: 'white', borderRadius: '3px', height: '35px', cursor: 'pointer' }}>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '20px' }}>
+                <button onClick={handleAddPlace} 
+                        className={style.container_button}>
                     加入行程
-                  </button>
-                </div>
+                </button>
+              </div>
              
             </div>
         ):(

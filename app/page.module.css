@@ -1,53 +1,101 @@
 .container{
-   position: relative;
-   height: 100vh;
+  position: relative;
+  height: 100vh;
 }
 
 .container_image{
   width:100%;
-  height:calc(100vh - 65px);
-  object-position: 50% 65%;
-  object-fit: cover;
+
+  height:100vh;
+  object-position: 50% 50%;
+  object-fit: fill;
   vertical-align:middle;
-  margin-top:65px;
+
 }
 
 .container_text{
   position: absolute;
-  top: 50%;
+  top: 40%;
   left: 50%; 
   transform: translate(-50%, -50%);
+  text-align: center;
+  border-radius: 10px;
+  padding: 30px;
 }
 
-@keyframes moveUpDown {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
+
+.name{
+  font-size: 50px;
+  font-weight: 600;
+  color:#ff4757;
+  text-shadow: 2px 2px 4px #ffffffff;
+  letter-spacing:7px;
+}
+
+.animatedText {
+
+  font-size:35px;
+  font-weight:900;
+  color:#ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.638);
+  margin-top: 15px;
+
+
+}
+
+/*按鈕效果*/
+.container_button{
+  width:100px;
+  font-size:18px;
+  margin-top:65px;
+  height:40px;
+  border:none;
+  background-color:#ff4757;
+  color:white;
+  font-weight:700;
+  border-radius:5px;
+  cursor:pointer;
+  position: relative;
+  overflow: hidden;
   
-  .animatedText {
-    animation: moveUpDown 2s infinite;
-    font-size:30PX;
-    font-weight:700;
-    color:#E4E4E4;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  }
-  
+}
+
+.container_button::after{
+  content: "";
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  background-color: black;
+  opacity: 0;
+ 
+ 
+}
+.container_button:hover::after{
+  opacity: 0.1;
+}
+
+
+.google_image{
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+}
 
 @media(max-width:1000px){
   .animatedText {
     font-size: 28px; 
     text-align: center; 
   }
-  .container_image{
-    height:calc(100vh - 60px);
-    margin-top:60px;
+  .name{
+    font-size: 40px;
   }
-  
 
+  .container_button{
+    width: 90px;
+  }
 
 
 }
@@ -57,8 +105,25 @@
     font-size: 25px; 
     text-align: center; 
   }
-  .container_image{
-    height:calc(100vh - 50px);
-    margin-top:50px;
+  .name{
+    font-size: 35px;
+  }
+  .container_button{
+    width: 85px;
+    font-size:16px;
+  }
+}
+
+@media (max-width:400px) {
+  .animatedText {
+    font-size: 20px; 
+    text-align: center; 
+  }
+  .name{
+    font-size: 30px;
+  }
+  .container_button{
+    width: 80px;
+    font-size:14px;
   }
 }

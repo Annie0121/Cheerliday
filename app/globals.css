@@ -13,14 +13,19 @@ body, html {
   z-index: 1000;
   position: fixed;
   background-color:	white;
+ 
 }
 .header_name{
   
   font-size: 35px;
-  font-weight: 700;
-  color: #ea9999ff;
+  
+ 
   cursor: pointer;
   margin-left: 20px;
+  font-weight: 600;
+  color:#ff4757;
+  text-shadow: 2px 2px 4px #ffffffff;
+  letter-spacing:5px;
 }
 
 .specialRoute {

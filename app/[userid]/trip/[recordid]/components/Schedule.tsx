@@ -184,7 +184,7 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
                 <div className={style.schedule_info_date} >{startdate} ~ {enddate}</div>
               </div>
                 <div style={{display:'flex',width:'100%',justifyContent:'space-between',height:'50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'}}>
-                    <div style={{width:'40px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',fontSize:'30px',textAlign:'center',paddingTop:'5PX',color:'#ea9999ff',cursor:'pointer'}} onClick={listLeft}>&lt;</div>
+                    <div style={{width:'40px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',fontSize:'30px',textAlign:'center',paddingTop:'5PX',color:'#ff4757',cursor:'pointer'}} onClick={listLeft}>&lt;</div>
                     <div style={{ width: 'calc(100% - 80px)',display: 'flex',overflow: 'hidden'}} ref={myRef}>
                         {dateRange.map((date, index:number) => (
                         <div key={index} 
@@ -195,7 +195,7 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
                         </div>
                         ))}
                     </div>
-                    <div style={{width:'40px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',fontSize:'30px',textAlign:'center',paddingTop:'5PX',color:'#ea9999ff',cursor:'pointer'}} onClick={listRight}>&gt;</div>
+                    <div style={{width:'40px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',fontSize:'30px',textAlign:'center',paddingTop:'5PX',color:'#ff4757',cursor:'pointer'}} onClick={listRight}>&gt;</div>
                 </div>
             </div>
 
@@ -234,7 +234,7 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
                                             <img style={{height:'80px',width:'80px',overflow:'hidden'}} src={attraction.picture}></img>
                                             <div style={{marginLeft:'10px',flexGrow: 1}}>
                                               <div style={{display:'flex',height:'20px',width:'180px'}}>
-                                                  <div onClick={()=>{setAttractionIndex(attractionindex);setSelectedDateIndex(dateindex)}} style={{ alignSelf: 'flex-end',fontSize:'13px',textDecoration:'underline',fontWeight:'800',textUnderlineOffset: '3px',cursor:'pointer',color:'#d05b6eff'}}>
+                                                  <div onClick={()=>{setAttractionIndex(attractionindex);setSelectedDateIndex(dateindex)}} style={{ alignSelf: 'flex-end',fontSize:'13px',textDecoration:'underline',fontWeight:'800',textUnderlineOffset: '3px',cursor:'pointer',color:'#7ab5d9ff'}}>
                                                     {Math.floor(attraction.stayDuration / 60)} 小時 {attraction.stayDuration % 60} 分鐘
                                                   </div>
 

@@ -64,7 +64,7 @@ export const DurationComponent =({AttractionIndex,setAttractionIndex,dateRange,s
     return(
       <div className={styles.dialog_background}>
         <div className={styles.duration_dialog}>
-          <div style={{ marginBottom: '30PX' }}>停留時間：</div>
+          <div style={{ marginBottom: '30PX',fontSize:'18px',fontWeight:'600',color:'#6fb6e1ff',letterSpacing:'2px' }}>停留時間：</div>
           <Select value={hour} onChange={(value)=>setHour(value)} style={{ width: 150, marginRight: 8 }}>
             {Array.from({ length: 12 }, (_, i) => (
               <Option key={i} value={i}>{i} 小時</Option>
@@ -79,7 +79,7 @@ export const DurationComponent =({AttractionIndex,setAttractionIndex,dateRange,s
   
           <div style={{ marginTop: '30px', width: '300px', textAlign: 'end' }}>
             <button onClick={()=>setAttractionIndex(null)} style={{ all: 'unset', color: '#666666', marginRight: '20px', fontSize: '17px', cursor: 'pointer' }}>取消</button>
-            <button onClick={handleDuration} style={{ width: '50px', height: '30px', fontWeight: '500', fontSize: '17px', backgroundColor: '#ea9999ff', border: '0px', color: 'white', borderRadius: '4px', cursor: 'pointer' }}>完成</button>
+            <button onClick={handleDuration} style={{ width: '50px', height: '30px', fontWeight: '500', fontSize: '17px', backgroundColor: '#ff4757', border: '0px', color: 'white', borderRadius: '4px', cursor: 'pointer' }}>完成</button>
           </div>
         </div>
       </div>

@@ -42,25 +42,7 @@ export default function Home(){
     
 
     //確認用戶登入狀態
-    /*
-    useEffect(()=>{
-        const  unsubscribe=onAuthStateChanged(auth,(currentUser)=>{
-          if(currentUser){
-            setUser(currentUser)
-            
-            const url=window.location.href.split("/")
-            let recordId=url[5];
-            if(!isLoaded){
-                fetchUserData(currentUser.uid,recordId);
-              }
-          }else{
-            console.log("沒有");
-            router.push("/")
-
-          }
-        })
-        return () => unsubscribe();
-    },[setUser,router])*/
+    
     useEffect(()=>{
       if(user){
         const url=window.location.href.split("/")
@@ -69,15 +51,8 @@ export default function Home(){
           fetchUserData(user.uid,recordId);
         }
       }
-    },[user,router])
-    /*
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setIsLoaded(true);
-      }, 10000); // 3000毫秒 = 3秒
-    
-      return () => clearTimeout(timer);
-    }, []);*/
+    },[user,loading])
+
 
     useEffect(() => {
       setIsMobile(window.innerWidth <= 1000);
