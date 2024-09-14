@@ -115,6 +115,7 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
           if (Object.keys(travelTimes).length === 0) {
             return [];
           }
+
             let currentTime = date.startTime;
             const times :{ startTime: string, endTime: string }[] = [];
             let currentDate=date.date
@@ -123,7 +124,7 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
                     let endTime = getDurationTime(startTime, attraction.stayDuration);
                     if (index < date.attractions.length - 1) {
                       if(travelTimes[currentDate] && travelTimes[currentDate][index]){
-                          let drivetime = parseInt(travelTimes[currentDate][index].split(" ")[0]);
+                          let drivetime = getTotalTime(travelTimes[currentDate][index])
                           currentTime = getDurationTime(endTime, drivetime); 
                       }
                         
@@ -291,3 +292,26 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
         </div>
     )
 }
+
+
+
+function getTotalTime(results:string){
+ 
+    const timeUnit = results.split(" ")
+    let totaltime = 0
+    let minute 
+    let hour 
+    for(let i =0;i<timeUnit.length;i++){
+  
+      if(timeUnit[i]=='小時'){
+        hour = parseInt(timeUnit[i-1])
+        totaltime += hour*60;
+      }else if(timeUnit[i] == "分鐘"){
+        minute = parseInt(timeUnit[i-1])
+        totaltime += minute
+      }
+    }
+  
+    return totaltime
+    
+  }

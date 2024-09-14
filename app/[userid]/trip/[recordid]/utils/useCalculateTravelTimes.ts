@@ -57,8 +57,8 @@ export function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTrav
                   (response, status) => {
                     if (status === routes.DistanceMatrixStatus.OK) {
                       if (response) {
-                        const results = response.rows[0].elements[0];
-                        newTravelTimes[day.date].push(results.duration.text);
+                        const results = response.rows[0].elements[0].duration.text;
+                        newTravelTimes[day.date].push(results);
                       }resolve(null);
                     } else {
                       reject(status);
@@ -77,3 +77,5 @@ export function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTrav
       calculateDistances();
     }, [routes, dateRange]);
   }
+
+

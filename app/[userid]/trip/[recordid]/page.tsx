@@ -1,28 +1,13 @@
 "use client"
 import { db, auth } from '@/app/firebase';
-import {onAuthStateChanged, User} from "firebase/auth"
-import {APIProvider, Map,Marker,useMap, useMapsLibrary,AdvancedMarker,Pin } from '@vis.gl/react-google-maps';
-import React, { useEffect, useState ,useRef} from 'react';
-import { doc, updateDoc,collection, setDoc,getDoc, onSnapshot , query, where,getDocs,deleteDoc } from "firebase/firestore"; 
+import React, { useEffect, useState } from 'react';
+import {collection,  onSnapshot , query, where, } from "firebase/firestore"; 
 import { useRouter } from "next/navigation";
 import styles from './recordid.module.css';
 import Image from 'next/image';
-import carImage from './car.png'
-import searchImg from './search.png'
-import openImg from './open.png'
-import webImg from './web.png'
-import phoneImg from './phone.png'
-import { Select, Button, Modal } from 'antd';
-import{ DurationComponent  } from './components/DurationComponent';
-import {TimeComponent} from './components/TimeComponent'
-import{MapContent} from './components/MapContent'
-import{getCoordinates} from './utils/getCoordinates'
-import{getDurationTime}from './utils/getDurationTime'
 import { SearchPlace} from './components/SearchPlace'
 import { Mymap}from "./components/Mymap"
 import{ Schedule} from "./components/Schedule"
-const { Option } = Select;
-import dayjs from 'dayjs';
 import mapimg from "./map.png"
 import { useUser } from '@/app/UserContext';
 

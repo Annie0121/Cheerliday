@@ -91,7 +91,7 @@ export function Plan({onClose, recordCount}:PlanProps){
     return(
         <div className={styles.plan_background}>
             <div className={styles.plan}>
-                <div>
+                <div >
                     <div className={styles.plan_name} >旅遊名稱：</div>
                     <input 
                         className={styles.plan_name_input}
@@ -136,7 +136,9 @@ interface DateInputProps {
 const DateInput:React.FC<DateInputProps> = ({ onChange }) => {
     return(
         <>
-            <RangePicker onChange={onChange} className={styles.dateinput}/>
+            <RangePicker onChange={onChange} 
+                         className={styles.dateinput} 
+                         />
         </>
     )
 }
