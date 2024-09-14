@@ -121,7 +121,7 @@
     }
     .list_container{
         width: 90%;
-        justify-content: space-between;
+        /*justify-content: space-between;*/
     }
     .list_items{
         width: 30%;
