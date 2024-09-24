@@ -2,14 +2,21 @@
 import { useRouter } from 'next/navigation'
 import styles from '../styles/plan.module.css';
 import { useState } from 'react';
-import { DatePicker } from 'antd';
-import { RangePickerProps } from 'antd/es/date-picker';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import{ generateDateRange } from '../utils/generateDateRange'
 import { getCoordinates } from '../utils/getCoordinates';
 import { auth ,db} from "../../firebase.js";
 import { collection, addDoc} from "firebase/firestore"; 
-const { RangePicker } = DatePicker;
+import { log } from 'console';
+import dayjs from 'dayjs';
 
+
+
+/*
+const { RangePicker } = DatePicker;
+import { DatePicker } from 'antd';
+import { RangePickerProps } from 'antd/es/date-picker';*/
 
 
 interface PlanProps {
@@ -29,25 +36,27 @@ export function Plan({onClose, recordCount}:PlanProps){
     const[name,setName]=useState("")
     const[city,setCity]=useState('')
     const [dateRange, setDateRange] = useState<DateRangeItem[]>([]);
-    const [startdate,setstartdate]=useState('')
-    const [enddate,setenddate]=useState('')
+    const [startdate, setStartDate] = useState<Date | null>(null);
+    const [enddate, setEndDate] = useState<Date | null>(null);
     const [showNameError, setShowNameError] = useState(false);
     const [showCityError, setShowCityError] = useState("");
-    const onChange:RangePickerProps['onChange'] = (dates, dateStrings) => {
-      if (dates) {
-        
-        
-        setstartdate(dateStrings[0])
-        setenddate(dateStrings[1])
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+ 
+
+    const handleChange = (dates: [Date |null, Date |null]) => {
         const [start, end] = dates;
-        const allDates = generateDateRange(start, end);
-        setDateRange(allDates);
+        setStartDate(start);
+        setEndDate(end);
+       
         
-      } else {
-        setDateRange([]);
-        
-      }
-    };
+        if (start && end) {
+            console.log(start,end);
+            const allDates = generateDateRange(dayjs(start), dayjs(end));
+            console.log(allDates);
+            setDateRange(allDates);
+        }
+    }   
+
 
     async function getPlan() {
         if (!name) {
@@ -61,6 +70,8 @@ export function Plan({onClose, recordCount}:PlanProps){
         try {
           const citycoordinates = await getCoordinates(city);
           const user = auth.currentUser;
+          const formattedStartDate = startdate ? startdate.toISOString().split('T')[0] : null;
+          const formattedEndDate = enddate ? enddate.toISOString().split('T')[0] : null;
           if (!user) {
             throw new Error('用戶未登錄');
           }
@@ -71,8 +82,8 @@ export function Plan({onClose, recordCount}:PlanProps){
             name,
             coordinates: citycoordinates.coordinates, 
             countryCode: citycoordinates.countryCode,
-            startdate,
-            enddate,
+            startdate:formattedStartDate,
+            enddate:formattedEndDate,
             dateRange,
             backgroundImage 
           });
@@ -105,7 +116,20 @@ export function Plan({onClose, recordCount}:PlanProps){
 
                 <div>
                     <div className={styles.plan_date}>日期：</div>
-                    <DateInput onChange={onChange} ></DateInput>
+                    <DatePicker
+                        selectsRange={true}
+                        selected={startdate}
+                        onChange={handleChange}
+                        startDate={startdate ||undefined}
+                        endDate={enddate||undefined}
+                        className={styles.dateinput }
+                        dateFormat="yyyy/MM/dd"
+                        placeholderText='出發日期    →     結束日期'
+                        withPortal
+                        portalId="root-portal"
+                        monthsShown={windowWidth >= 800 ? 2 : 1}
+
+                    />
                     
                 </div>
 
@@ -130,15 +154,3 @@ export function Plan({onClose, recordCount}:PlanProps){
     )
 }
 
-interface DateInputProps {
-    onChange:RangePickerProps['onChange'];
-}
-const DateInput:React.FC<DateInputProps> = ({ onChange }) => {
-    return(
-        <>
-            <RangePicker onChange={onChange} 
-                         className={styles.dateinput} 
-                         />
-        </>
-    )
-}

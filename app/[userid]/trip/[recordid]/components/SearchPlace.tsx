@@ -1,10 +1,12 @@
-import React, {  useState } from 'react';
+import React, {  useEffect, useRef, useState } from 'react';
 import{getCoordinates} from '../utils/getCoordinates'
-import {APIProvider } from '@vis.gl/react-google-maps';
+import {APIProvider,useMap,useMapsLibrary } from '@vis.gl/react-google-maps';
 import Image from 'next/image';
 import { Placeinformation} from '../components/Placeinformation'
 import searchImg from '../search.png'
 import style from "../styles/searchplace.module.css"
+import { createRoot } from 'react-dom/client';
+import { log } from 'console';
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 
@@ -51,30 +53,13 @@ interface searchPlace{
   } | null>>}
 
 export function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:searchPlace){
-    const[place,setPlace]=useState('')
+    
     const [placeCoordinates, setPlaceCoordinates] = useState<{ lat: number | null, lng: number | null }>({ lat: null, lng: null });
     const [countryCode,setCountryCode]= useState(record?record.countryCode:'')
     const[placeId,setPlaceId]=useState('')
     const[error,seterror]=useState('')
-
-    //獲取景點座標及PlaceId
-    const handleSearchPlace =async () => {
-      try {
-        const placeinfo = await getCoordinates(place,countryCode);
-        const coordinates=placeinfo.coordinates
-        const placeId= placeinfo.placeId
-        setPlaceId(placeId)
-        setPlaceCoordinates(coordinates);
-        setSearchMarker(coordinates);
-        seterror("")
-    } catch (error) {
-        console.error(error);
-        seterror("查無景點")
-       
-    }
-         
-    };
-
+    const[place,setPlace]=useState('')
+  
     //回上一頁
     function back(){
         setPlace("");
@@ -84,26 +69,25 @@ export function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:
 
     }
 
+  
+
     return(
       <APIProvider apiKey={`${apiKey}`}>
           <div className={style.searchplace}>
             <div style={{margin:'40px auto',width:'90%'}} >
                 <div className={style.searchplace_back}  onClick={back}>←  回上頁</div>
 
-                <div style={{display:'flex',margin:'0 auto'}}>
-                    <input 
-                      type="text" 
-                      placeholder="輸入景點"  
-                      onChange={(e)=>{setPlace(e.target.value)}}
-                      value={place}
-                      className={style.search_input}
-                    />
-                    <div className={style.search_input_button}
-                         onClick={()=>{setPlace(''),handleSearchPlace(),setPlaceId('')}}>
+                <Placeinput 
+                            setPlaceId={setPlaceId} 
+                            setPlaceCoordinates={setPlaceCoordinates}
+                            setSearchMarker={setSearchMarker}
+                            seterror={seterror}
+                            countryCode={countryCode}
+                            place={place}
+                            setPlace={setPlace}
+                            
 
-                         <Image  width={22} height={22} src={searchImg} alt="search" />
-                    </div>
-                </div>
+                ></Placeinput>
                 {error&&(<div className={style.error} >{error}</div>)}
                 
                 {placeId && (
@@ -123,4 +107,112 @@ export function SearchPlace({record,setSelectedDay,selectedDay,setSearchMarker}:
       </APIProvider>
         
     )
+}
+
+
+
+interface placeinput{
+  setPlaceId:React.Dispatch<React.SetStateAction<string>>,
+  setPlaceCoordinates:React.Dispatch<React.SetStateAction<{
+    lat: number | null;
+    lng: number | null;
+  }>>
+  setSearchMarker: React.Dispatch<React.SetStateAction<{
+    lat: number;
+    lng: number;
+  } | null>>,
+  seterror:React.Dispatch<React.SetStateAction<string>>,
+  countryCode: string,
+  place:string,
+  setPlace: React.Dispatch<React.SetStateAction<string>>
+}
+
+export function Placeinput({setPlaceId,setPlaceCoordinates,setSearchMarker,seterror,countryCode,place,setPlace}:placeinput){
+  
+    //獲取景點座標及PlaceId
+    const inputRef =useRef<HTMLInputElement >(null); 
+    const [placeAutocomplete, setPlaceAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+    const map = useMap();
+    const places = useMapsLibrary("places") ;
+    const [isAutocompleteSelected, setIsAutocompleteSelected] = useState(false);
+    
+
+     //搜尋按紐，獲取景點座標及PlaceId
+    const handleSearchPlace =async () => {
+      try {
+        
+        if(isAutocompleteSelected){
+          const info=placeAutocomplete?.getPlace()
+          const placeId = info?.place_id ?? "";
+          setPlaceId(placeId); 
+          
+          if (info?.geometry && info.geometry.location) {
+            const lat = info.geometry.location.lat();
+            const lng = info.geometry.location.lng();
+            console.log({ lat, lng });
+            setPlaceCoordinates({ lat, lng });
+            setSearchMarker({ lat, lng });
+            //清空資料
+            seterror("")
+            setIsAutocompleteSelected(false)
+            setPlace("")
+            
+          }
+        
+        }else{
+          
+          const placeinfo = await getCoordinates(place,countryCode);
+          const coordinates=placeinfo.coordinates
+          const placeId=  placeinfo.placeId
+          setPlaceId(placeId)
+          setPlaceCoordinates(coordinates);
+          setSearchMarker(coordinates);
+          seterror("")
+          setPlace("")
+          
+        }
+      
+     } catch (error) {
+        console.error(error);
+        seterror("查無景點")
+        
+    }};
+
+    //處理autocomplete
+    useEffect(()=>{
+    if (!places || !inputRef.current)return;
+   
+    setPlaceAutocomplete(new places.Autocomplete(inputRef.current));
+    
+  },[places])  
+
+  useEffect(()=>{
+    if (!placeAutocomplete) return;
+    placeAutocomplete.addListener('place_changed', () => {
+      setIsAutocompleteSelected(true)
+    });
+  },[placeAutocomplete])
+
+
+
+
+
+
+  return(
+    <div style={{display:'flex',margin:'0 auto'}}>
+                    <input 
+                      type="text" 
+                      placeholder="輸入景點"  
+                      onChange={(e)=>{setPlace(e.target.value)}}
+                      className={style.search_input}
+                      ref={inputRef}
+                      
+                    />
+                    <div className={style.search_input_button}
+                         onClick={()=>{handleSearchPlace(),setPlace("")}}>
+
+                         <Image  width={22} height={22} src={searchImg} alt="search" />
+                    </div>
+  </div>
+  )
 }

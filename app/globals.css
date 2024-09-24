@@ -72,6 +72,8 @@ body, html {
   background-Position: center; 
   background-size: cover;
 }
+
+
 @media(max-width:1000px){
 
   .header{

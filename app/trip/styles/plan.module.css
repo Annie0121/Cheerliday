@@ -48,10 +48,16 @@
 }
 .dateinput{
     height: 30px !important;
-    width: 300px !important;
+    width: 278px !important;
     margin-top: 5px !important;
     border: 2px solid #cccccc !important;
     border-radius: 3px!important;
+    padding:0px 11px;
+    
+}
+.dateinput::placeholder{
+    font-weight:500;
+    color:rgb(185, 185, 185);
     
 }
 
@@ -109,9 +115,12 @@
     color:white;
     border-radius:2px;
     cursor:pointer;
+   
     
     
 }
+
+
 
 @media (max-width:800px) {
     .plan_background{

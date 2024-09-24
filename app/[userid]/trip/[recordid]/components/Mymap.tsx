@@ -78,6 +78,7 @@ export  function Mymap({record,searchMarker,setTravelTimes}:Mymap){
                         center={center }
                         zoom={zoom }
                         key={searchMarker ? 'focused' : 'default'}
+                      
                     >
                           <MapContent  
                             dateRange={dateRange} 
@@ -93,3 +94,4 @@ export  function Mymap({record,searchMarker,setTravelTimes}:Mymap){
            
           
 }
+

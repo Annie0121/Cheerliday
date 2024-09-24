@@ -46,7 +46,7 @@ function Header({setSigninModel}:signinmodel ) {
   }
 
   if (loading ||!user) return;
- console.log(user.photoURL);
+
  
   
   return (

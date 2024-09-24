@@ -28,6 +28,7 @@ interface Coordinates {
     
 
 interface placeinformation{
+  
     placeId:string,
     setPlaceCoordinates:React.Dispatch<React.SetStateAction<{
         lat: number | null;
@@ -78,7 +79,8 @@ export function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates
             if (photos && photos.length > 0) {
               const photoUrl = photos[0].getUrl({ maxWidth: 400, maxHeight: 400 });
               setPhotoUrl(photoUrl);
-              console.log(photoUrl);
+              
+            
             }
         }
       })
