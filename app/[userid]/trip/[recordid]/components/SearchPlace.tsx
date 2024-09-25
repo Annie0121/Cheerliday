@@ -134,49 +134,28 @@ export function Placeinput({setPlaceId,setPlaceCoordinates,setSearchMarker,seter
     const [placeAutocomplete, setPlaceAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
     const map = useMap();
     const places = useMapsLibrary("places") ;
-    const [isAutocompleteSelected, setIsAutocompleteSelected] = useState(false);
+  
     
 
-     //搜尋按紐，獲取景點座標及PlaceId
+    //搜尋按紐，獲取景點座標及PlaceId
     const handleSearchPlace =async () => {
-      try {
-        
-        if(isAutocompleteSelected){
-          const info=placeAutocomplete?.getPlace()
-          const placeId = info?.place_id ?? "";
-          setPlaceId(placeId); 
-          
-          if (info?.geometry && info.geometry.location) {
-            const lat = info.geometry.location.lat();
-            const lng = info.geometry.location.lng();
-            console.log({ lat, lng });
-            setPlaceCoordinates({ lat, lng });
-            setSearchMarker({ lat, lng });
-            //清空資料
-            seterror("")
-            setIsAutocompleteSelected(false)
-            setPlace("")
-            
-          }
-        
-        }else{
-          
-          const placeinfo = await getCoordinates(place,countryCode);
-          const coordinates=placeinfo.coordinates
-          const placeId=  placeinfo.placeId
-          setPlaceId(placeId)
-          setPlaceCoordinates(coordinates);
-          setSearchMarker(coordinates);
-          seterror("")
-          setPlace("")
-          
-        }
       
-     } catch (error) {
-        console.error(error);
-        seterror("查無景點")
-        
-    }};
+      try {
+            const placeinfo = await getCoordinates(place,countryCode);
+            const coordinates=placeinfo.coordinates
+            const placeId=  placeinfo.placeId
+            setPlaceId(placeId)
+            setPlaceCoordinates(coordinates);
+            setSearchMarker(coordinates);
+            seterror("")
+            setPlace("")
+            } 
+
+      catch (error) {
+                console.error(error);
+                seterror("查無景點")
+
+        }};
 
     //處理autocomplete
     useEffect(()=>{
@@ -189,7 +168,10 @@ export function Placeinput({setPlaceId,setPlaceCoordinates,setSearchMarker,seter
   useEffect(()=>{
     if (!placeAutocomplete) return;
     placeAutocomplete.addListener('place_changed', () => {
-      setIsAutocompleteSelected(true)
+      const info = placeAutocomplete.getPlace()
+      const name = info.name ?? ""; 
+      setPlace(name)
+      
     });
   },[placeAutocomplete])
 
