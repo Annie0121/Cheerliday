@@ -43,7 +43,7 @@ export default function Collection(){
             <Row gutter={[20, 20]}>   
              {
                 records && records.map((record,index)=>(
-                    <Col xs={24} md={12} lg={12}  >
+                    <Col xs={24} md={12} lg={12} key={index} >
                         <div className={styles.collection_container_list}
                              onClick={()=>{geturl(record.userid,record.id)}}>
                             
