@@ -1,0 +1,112 @@
+.collection_container{
+    width: 1080px;
+    margin: 20px auto
+}
+.collection_container_list{
+    min-height: 150px;
+    display: flex;
+    background-color:white;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
+    border-radius:5px;
+    cursor:pointer;
+    flex-wrap: wrap;
+}
+
+.collection_container_info{
+    margin:20px 15px;
+}
+.collection_container_info_name{
+    font-size:25px;
+    font-weight:700;
+}
+.collection_container_info_date{
+    font-size:18px;
+    color:#767474ff;
+    margin-top:10px
+}
+.collection_container_info_pic{
+    object-fit: cover;
+    border-top-left-radius:5px;
+    border-bottom-left-radius:5px
+}
+.collection_container_info_city{
+    font-size:18px;
+    margin-left:5px;
+    font-weight:500;
+    color:#5f6666ff;
+}
+
+.collection_container_info_authorName{
+    font-size:15px;
+    margin-right:15px;
+    color:#5f6666ff;
+    font-weight:400
+}
+@media (max-width:1100px){
+    .collection_container{
+        width: 90%;
+    }
+    .collection_container_info{
+        margin: 15px 10px;
+    }
+    .collection_container_info_name{
+        font-size: 22px;
+
+    }
+    .collection_container_info_date{
+        font-size: 15px;
+    }
+    .collection_container_info_city{
+        font-size: 15px;
+    }
+    .collection_container_info_citypic{
+        height: 15px;
+        width: 12px;
+    }
+}
+@media (max-width:800px){
+    .collection_container{
+        width: 80%;
+    }
+    .collection_container_info{
+        margin: 20px 15px;
+    }
+    .collection_container_info_name{
+        font-size: 20px;
+
+    }
+    .collection_container_info_date{
+        font-size: 13px;
+    }
+    .collection_container_info_city{
+        font-size: 13px;
+    }
+    .collection_container_info_authorName{
+        font-size: 13px;
+    }
+}
+@media (max-width:767px){
+    
+    .collection_container_info_name{
+        font-size: 25px;
+
+    }
+    .collection_container_info_date{
+        font-size: 18px;
+    }
+    .collection_container_info_city{
+        font-size: 18px;
+    }
+    .collection_container_info_authorName{
+        font-size: 15px;
+    }
+}
+@media (max-width:575px) {
+    .collection_container_info_piccontanier{
+        height: 150px;
+    }
+    .collection_container_info_pic{
+        border-top-right-radius: 5px;
+        border-bottom-left-radius: 0px;
+    }
+}

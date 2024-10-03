@@ -119,8 +119,7 @@ export function Placeinformation({ placeId, placeCoordinates,setPlaceCoordinates
             //存數據 
             if(docSnap.exists()){
                 const dateRange: DateRangeItem[]  =docSnap.data().dateRange;
-                console.log(dateRange);
-                console.log(selectedDay);
+                
                 
                 dateRange.forEach(element => {
                     if(element.date==selectedDay){

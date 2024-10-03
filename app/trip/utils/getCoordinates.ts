@@ -6,9 +6,9 @@ export async  function  getCoordinates(address:string) {
 
     const response = await fetch(url);
     const data = await response.json();
-    console.log(data);
     const addressComponents = data.results[0].address_components;
     const location = data.results[0].geometry.location;
+    const cityname = addressComponents[0].long_name
     
     let countryCode = "";
     for (let component of addressComponents) {
@@ -23,7 +23,8 @@ export async  function  getCoordinates(address:string) {
             lat: location.lat,
             lng: location.lng,
         },
-        countryCode: countryCode
+        countryCode: countryCode,
+        cityname:cityname
     };
   }
 

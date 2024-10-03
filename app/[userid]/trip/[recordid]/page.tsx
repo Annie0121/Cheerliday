@@ -24,16 +24,18 @@ export default function Home(){
     const [activeView, setActiveView] = useState(false);
     const router=useRouter()
     const { user, loading } = useUser();
-    
+    const [isAuthor, setIsAuthor] = useState(false);
 
     //確認用戶登入狀態
     
     useEffect(()=>{
       if(user){
         const url=window.location.href.split("/")
-        let recordId=url[5];
+        const authorId = url[3];
+        const recordId=url[5];
         if(!loading){
-          fetchUserData(user.uid,recordId);
+          setIsAuthor(user.uid === authorId);
+          fetchUserData(authorId,recordId);
         }
       }
     },[user,loading])
@@ -91,7 +93,7 @@ export default function Home(){
                         record={record} 
                         travelTimes={travelTimes} 
                         setRecord={setRecord}
-                        
+                        isAuthor={isAuthor}
                       ></Schedule>}
               </div>
                 

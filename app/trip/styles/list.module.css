@@ -74,6 +74,13 @@
 
 }
 
+.lock_icon {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2; /* 確保鎖圖標在圖片上方 */
+}
+
 .list_items_delete{
     background-color:white;
     height:20px;
@@ -88,7 +95,12 @@
     border-radius:50%;
     z-index:1
 }
-
+.lock{
+    color:#454545
+}
+.lock:hover{
+    color: red;
+}
 
 .list_items_text{
     background-color:white;
@@ -101,7 +113,10 @@
     margin:10px 10px;
     font-size:19px;
     font-weight:900;
-    color:#4d4d4dff
+    color:#4d4d4dff;
+    display: flex;
+    align-items: center;
+    line-height: 1.2;
 }
 
 .list_items_text_date{

@@ -8,7 +8,7 @@ import{ generateDateRange } from '../utils/generateDateRange'
 import { getCoordinates } from '../utils/getCoordinates';
 import { auth ,db} from "../../firebase.js";
 import { collection, addDoc} from "firebase/firestore"; 
-import { log } from 'console';
+import { User } from 'firebase/auth';
 import dayjs from 'dayjs';
 
 
@@ -20,6 +20,7 @@ import { RangePickerProps } from 'antd/es/date-picker';*/
 
 
 interface PlanProps {
+    user: User | null;
     onClose: () => void;
     recordCount:number
 }
@@ -31,7 +32,7 @@ interface DateRangeItem {
     
 }
 
-export function Plan({onClose, recordCount}:PlanProps){
+export function Plan({user,onClose, recordCount}:PlanProps){
     const router = useRouter();
     const[name,setName]=useState("")
     const[city,setCity]=useState('')
@@ -41,7 +42,7 @@ export function Plan({onClose, recordCount}:PlanProps){
     const [showNameError, setShowNameError] = useState(false);
     const [showCityError, setShowCityError] = useState("");
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
- 
+    const [ authorName,setauthorName] = useState("")
 
     const handleChange = (dates: [Date |null, Date |null]) => {
         const [start, end] = dates;
@@ -68,24 +69,33 @@ export function Plan({onClose, recordCount}:PlanProps){
             return;
         }
         try {
-          const citycoordinates = await getCoordinates(city);
-          const user = auth.currentUser;
+          const { coordinates, countryCode, cityname } = await getCoordinates(city);
           const formattedStartDate = startdate ? startdate.toISOString().split('T')[0] : null;
           const formattedEndDate = enddate ? enddate.toISOString().split('T')[0] : null;
           if (!user) {
             throw new Error('用戶未登錄');
           }
+          const authorName = user.providerData[0]?.providerId === "google.com"
+          ? user.displayName!
+          : user.email!.split('@')[0];
+          setauthorName(authorName);
+       
           const userid = user.uid;
           const backgroundImage = `${(recordCount % 8)+1 }.jpg`;
           const docRef = await addDoc(collection(db, 'record'), {
             userid,
             name,
-            coordinates: citycoordinates.coordinates, 
-            countryCode: citycoordinates.countryCode,
+            coordinates: coordinates, 
+            countryCode: countryCode,
             startdate:formattedStartDate,
             enddate:formattedEndDate,
             dateRange,
-            backgroundImage 
+            backgroundImage,
+            cityname:cityname,
+            privacy:"private",
+            authorName:authorName
+            
+            
           });
           
           const recordid =docRef.id

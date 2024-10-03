@@ -29,7 +29,8 @@ interface Schedule{
     record:Record,
     setSelectedDay:React.Dispatch<React.SetStateAction<string>>,
     travelTimes: { [key: string]: string };
-    setRecord:React.Dispatch<any>
+    setRecord:React.Dispatch<any>;
+    isAuthor:boolean
 }
 
 interface DateRangeItem {
@@ -47,7 +48,8 @@ interface Record {
     userid: string;
     countryCode:string;
     statrTime:string;
-    backgroundImage:string
+    backgroundImage:string,
+   
 }
 
 interface Coordinates {
@@ -55,7 +57,7 @@ interface Coordinates {
     lng: number;
 }
 
-export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule){
+export function Schedule({record,setSelectedDay,travelTimes,setRecord,isAuthor}:Schedule){
     const [name, setname] = useState(record ? record.name : "");
     const[startdate,setstartdate]=useState(record ? record.startdate : "");
     const[enddate,setenddate]=useState(record ? record.enddate : "");
@@ -66,6 +68,7 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
     const [selectedDateIndex, setSelectedDateIndex] = useState<number| null>(null);
     const [calculatedTimes, setCalculatedTimes] = useState<{ [key: string]: { startTime: string, endTime: string }[] }>({});
     const [AutoScrollEnabled,setAutoScrollEnabled]=useState(true)
+    console.log(isAuthor);
     
     //組件渲染後訪問和操作 DOM 元素
     const myRef = useRef<HTMLDivElement>(null);
@@ -274,9 +277,9 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
 
                             <div style={{height:'30px',display: 'flex', alignItems:'center',justifyItems:'center',margin:'5px',width:'130px'}}>
                               <span>出發時間：</span>
-                              <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={()=>{setshowModal(true),setCurrentDateIndex(dateindex)}}>{dateRange[dateindex].startTime}</span>
+                              <span style={{ textDecoration: 'underline', cursor: isAuthor?'pointer':'default' }} onClick={()=>{setshowModal(true),setCurrentDateIndex(dateindex)}}>{dateRange[dateindex].startTime}</span>
                               {
-                                showModal && <TimeComponent dateRange={dateRange} currentDateIndex={currentDateIndex} setDateRange={setDateRange} setshowModal={setshowModal} ></TimeComponent>
+                                showModal && isAuthor &&<TimeComponent dateRange={dateRange} currentDateIndex={currentDateIndex} setDateRange={setDateRange} setshowModal={setshowModal} ></TimeComponent>
                               }
                             </div>
                             
@@ -294,7 +297,10 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
                                         return(
                                               
                                         <React.Fragment key={attractionindex}>
-                                          <Draggable  key={`${dateindex}-${attractionindex}`} draggableId={`${dateindex}-${attractionindex}`} index={attractionindex}>
+                                          <Draggable  key={`${dateindex}-${attractionindex}`} 
+                                                      draggableId={`${dateindex}-${attractionindex}`} 
+                                                      index={attractionindex}
+                                                      isDragDisabled={!isAuthor}>
                                                 {(provided)=>
                                                 (
                                                   <div
@@ -307,7 +313,8 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
                                                                 <img style={{height:'80px',width:'80px',overflow:'hidden'}} src={attraction.picture}></img>
                                                                 <div style={{marginLeft:'10px',flexGrow: 1}}>
                                                                   <div style={{display:'flex',height:'20px',width:'180px'}}>
-                                                                      <div onClick={()=>{setAttractionIndex(attractionindex);setSelectedDateIndex(dateindex)}} style={{ alignSelf: 'flex-end',fontSize:'13px',textDecoration:'underline',fontWeight:'800',textUnderlineOffset: '3px',cursor:'pointer',color:'#7ab5d9ff'}}>
+                                                                      <div onClick={()=>{setAttractionIndex(attractionindex);setSelectedDateIndex(dateindex)}} 
+                                                                           style={{ alignSelf: 'flex-end',fontSize:'13px',textDecoration:'underline',fontWeight:'800',textUnderlineOffset: '3px',cursor:isAuthor?'pointer':'default',color:'#7ab5d9ff'}}>
                                                                         {Math.floor(attraction.stayDuration / 60)} 小時 {attraction.stayDuration % 60} 分鐘
                                                                       </div>
 
@@ -318,7 +325,7 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
                                                                       </div>
                                                                   </div>
                                                                   {
-                                                                    AttractionIndex !== null && selectedDateIndex !== null && 
+                                                                    AttractionIndex !== null && selectedDateIndex !== null && isAuthor &&
                                                                     (<DurationComponent  
                                                                       selectedDateIndex={selectedDateIndex} 
                                                                       dateRange={dateRange} 
@@ -334,7 +341,10 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
                                                                   </div>
                                                                   <div style={{fontSize:'13px',marginTop:'3PX',color:'#6a6969ff',fontWeight:'500'}}>{attraction.address}</div>
                                                                 </div>
-                                                                <span style={{cursor:'pointer'}} onClick={()=>handleDel(attractionindex,dateindex)}>×</span>
+                                                                {isAuthor &&(
+                                                                    <span style={{cursor:'pointer'}} onClick={()=>handleDel(attractionindex,dateindex)}>×</span>
+                                                                )}
+                                                                
                                                               </div>  
                                                           </div>
                                                   </div>
@@ -360,14 +370,18 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,}:Schedule
                                   </div>
                                 )}
                               </Droppable>
-                        
-                        <div style={{margin:'0 100px 30px 100px',width:'70px',height:'80px',display: 'grid', placeItems: 'center'}}>
-                            <div style={{width: '50px',height: '50px',lineHeight:'50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',borderRadius:' 50%',display: 'flex',alignItems: 'center',justifyContent: 'center',backgroundColor: 'white',cursor:'pointer',fontSize:'35px'}}
-                                 onClick={() => addplace(date.date)}>
-                                    ＋
-                            </div> 
-                          <div style={{marginTop:'10PX',fontWeight:'600',color:'#666666ff'}}>加入景點</div>
-                        </div>
+                        {
+                          isAuthor&&(
+                             <div style={{margin:'0 100px 30px 100px',width:'70px',height:'80px',display: 'grid', placeItems: 'center'}}>
+                                <div style={{width: '50px',height: '50px',lineHeight:'50px',boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',borderRadius:' 50%',display: 'flex',alignItems: 'center',justifyContent: 'center',backgroundColor: 'white',cursor:'pointer',fontSize:'35px'}}
+                                    onClick={() => addplace(date.date)}>
+                                        ＋
+                                </div> 
+                              <div style={{marginTop:'10PX',fontWeight:'600',color:'#666666ff'}}>加入景點</div>
+                            </div>
+                          )
+                        }
+                       
                       
                     </React.Fragment>)
                 })} 

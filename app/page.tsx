@@ -16,9 +16,7 @@ export default function Home() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        
-        
-        // router.push('/trip'); 導向 /trip 頁面
+        router.push('/trip'); //導向 /trip 頁面
       } else {
         setUser(null);
       }
