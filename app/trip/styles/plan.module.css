@@ -48,11 +48,12 @@
 }
 .dateinput{
     height: 30px !important;
-    width: 278px !important;
+    width: 300px !important;
     margin-top: 5px !important;
     border: 2px solid #cccccc !important;
     border-radius: 3px!important;
     padding:0px 11px;
+    box-sizing: border-box;
     
 }
 .dateinput::placeholder{
@@ -88,6 +89,7 @@
     margin-left:2px;
     color:red
 }
+
 .dateinput .ant-picker-input {
     height: 100% !important;
 }
@@ -151,6 +153,7 @@
         margin-top: 5px !important;
         border: 2px solid #cccccc !important;
         border-radius: 0%!important;
+        box-sizing: border-box;
         
     }
 
