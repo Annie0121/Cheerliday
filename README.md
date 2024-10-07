@@ -8,7 +8,7 @@ Cheerliday 是一個幫助旅行者高效安排行程的網站。用戶可以添
 <h2 style="font-size: 25px; font-weight: bold;">使用範例</h2>
 
 ###  Step 1: 創建你的旅程
-<div style="display: flex; align-items: flex-start; gap: 20px;width:100%">
+<div style="display: flex; width:100%">
   <div style="width:60%">
     <img src="./public/image/firststep.gif" alt="First Step" style="max-width: 100%; height: auto;">
   </div>
@@ -25,7 +25,7 @@ Cheerliday 是一個幫助旅行者高效安排行程的網站。用戶可以添
 
 ### Step 2: 添加精彩景點
 
-<div style="display: flex; align-items: flex-start; gap: 20px;width:100%">
+<div style="display: flex;width:100%">
   <div style="width:60%">
     <img src="./public/image/second.gif" alt="Second Step" style="max-width: 100%; height: auto;">
   </div>
@@ -44,7 +44,7 @@ Cheerliday 是一個幫助旅行者高效安排行程的網站。用戶可以添
 ### Step 3: 優化你的行程
 
 
-<div style="display: flex; align-items: flex-start; gap: 20px;width:100%">
+<div style="display: flex; width:100%">
   <div style="width:60%">
     <img src="./public/image/third.gif" alt="Third Step" style="max-width: 100%; height: auto;">
   </div>
@@ -62,7 +62,7 @@ Cheerliday 是一個幫助旅行者高效安排行程的網站。用戶可以添
 
 ### Step 4: 管理行程隱私
 
-<div style="display: flex; align-items: flex-start; gap: 20px;width:100%">
+<div style="display: flex; width:100%">
   <div style="width:60%">
     <img src="./public/image/forth.gif" alt="Fourth Step" style="max-width: 100%; height: auto;">
   </div>
