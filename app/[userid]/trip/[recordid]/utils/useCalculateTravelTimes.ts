@@ -32,7 +32,7 @@ export function useCalculateTravelTimes({dateRange,setTravelTimes}:calculateTrav
     const routes = useMapsLibrary("routes");
     useEffect(() => {
         if (!routes) {
-            console.log("Routes library is not loaded yet");
+            
             return;
           }
       const service = new routes.DistanceMatrixService();

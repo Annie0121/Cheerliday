@@ -2,7 +2,7 @@
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 export async function  getCoordinates(address:string,countryCode:string) {
-    console.log(countryCode);
+   
     
      
       const encodedCity = encodeURIComponent(address);

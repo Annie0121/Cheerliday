@@ -68,8 +68,7 @@ export function Schedule({record,setSelectedDay,travelTimes,setRecord,isAuthor}:
     const [selectedDateIndex, setSelectedDateIndex] = useState<number| null>(null);
     const [calculatedTimes, setCalculatedTimes] = useState<{ [key: string]: { startTime: string, endTime: string }[] }>({});
     const [AutoScrollEnabled,setAutoScrollEnabled]=useState(true)
-    console.log(isAuthor);
-    
+   
     //組件渲染後訪問和操作 DOM 元素
     const myRef = useRef<HTMLDivElement>(null);
     //點擊左右

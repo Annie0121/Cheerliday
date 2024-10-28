@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState ,useRef} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import { doc, updateDoc,getDoc } from "firebase/firestore"; 
 import { db, auth } from '@/app/firebase';

@@ -6,17 +6,14 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import{ generateDateRange } from '../utils/generateDateRange'
 import { getCoordinates } from '../utils/getCoordinates';
-import { auth ,db} from "../../firebase.js";
+import {db} from "../../firebase.js";
 import { collection, addDoc} from "firebase/firestore"; 
 import { User } from 'firebase/auth';
 import dayjs from 'dayjs';
 
 
 
-/*
-const { RangePicker } = DatePicker;
-import { DatePicker } from 'antd';
-import { RangePickerProps } from 'antd/es/date-picker';*/
+
 
 
 interface PlanProps {
@@ -51,9 +48,7 @@ export function Plan({user,onClose, recordCount}:PlanProps){
        
         
         if (start && end) {
-            console.log(start,end);
             const allDates = generateDateRange(dayjs(start), dayjs(end));
-            console.log(allDates);
             setDateRange(allDates);
         }
     }   

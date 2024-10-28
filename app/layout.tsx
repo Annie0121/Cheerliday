@@ -38,12 +38,6 @@ function Header({setSigninModel}:signinmodel ) {
 
 
 
-  function handleSignin() {
-    setSigninModel(true)
- 
- 
-  }
-
   if (loading ||!user) return;
 
  

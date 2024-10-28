@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { doc, updateDoc} from "firebase/firestore"; 
 import { db, auth } from '@/app/firebase';
 import styles from '../recordid.module.css';
-import { Select, Button, Modal } from 'antd';
+import { Select,  } from 'antd';
 const { Option } = Select;
 interface Coordinates {
     lat: number;

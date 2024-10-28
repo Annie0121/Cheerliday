@@ -5,8 +5,6 @@ import Image from 'next/image';
 import { Placeinformation} from '../components/Placeinformation'
 import searchImg from '../search.png'
 import style from "../styles/searchplace.module.css"
-import { createRoot } from 'react-dom/client';
-import { log } from 'console';
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 
